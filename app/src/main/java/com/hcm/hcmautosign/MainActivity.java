@@ -133,11 +133,10 @@ public class MainActivity extends AppCompatActivity {
 
                 if(params[0].equals("GeoCheck" )) {
                     Log.i("-----send action", "GeoCheck");
-                    return HCM_GeoCheck(authorization);
+                    return HCM_GeoCheck_OKHttp(authorization);
                 }
                 if(params[0].equals("Punchin")) {
                     Log.i("-----send action", "Punchin");
-                    //return HCM_Punchin();
                     return HCM_Punchin_OKHttp(authorization);
                 }
                 if(params[0].equals("PunCheck")) {
@@ -395,6 +394,59 @@ public class MainActivity extends AppCompatActivity {
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
+            }
+            return null;
+        }
+
+        public String HCM_GeoCheck_OKHttp(String authorization){
+            String url_str = "https://open.hcmcloud.cn/api/attend.signin.geocheck";
+            String name = "hcm cloud";
+            String accuracy = "0";
+            String latitude = "31.260886";
+            String longitude = "121.62253";
+            Long tsLong = System.currentTimeMillis();
+            String timestamp = tsLong.toString();
+            List<String> hash_text_list = new ArrayList<>();
+            hash_text_list.add(latitude);
+            hash_text_list.add(longitude);
+            hash_text_list.add(accuracy);
+            hash_text_list.add(timestamp);
+            hash_text_list.add(name);
+
+            String hash_text_joined = TextUtils.join("", hash_text_list);
+            String hash_text = md5(hash_text_joined);
+
+            Log.i("-----send timestamp", timestamp);
+            Log.i("-----send Hash text", hash_text_joined);
+            Log.i("-----send Hashed", hash_text);
+
+            OkHttpClient client = new OkHttpClient();
+            MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
+            RequestBody body = RequestBody.create(mediaType, "{\"latitude\":\"31.260886\",\"longitude\":\"121.62253\",\"accuracy\":0,\"timestamp\":" + timestamp + ",\"hash\":\"" + hash_text + "\"}");
+            Log.i("-----send Request Body", "Send Request Body");
+            //DownloadManager.Request request = new DownloadManager.Request.Builder()
+            Request request = new Request.Builder()
+                    .url(url_str)
+                    .post(body)
+                    .addHeader("charset", "utf-8")
+                    .addHeader("accept-encoding", "gzip")
+                    .addHeader("referer", "https://servicewechat.com/wx3b6d85db7f8fb428/4/page-frame.html")
+                    .addHeader("authorization", authorization)
+                    .addHeader("content-type", "application/json")
+                    .addHeader("user-agent", user_agent)
+                    .addHeader("content-length", "129")
+                    .addHeader("host", "open.hcmcloud.cn")
+                    .addHeader("connection", "Keep-Alive")
+                    .addHeader("cache-control", "no-cache")
+                    .build();
+            try {
+                Response response = client.newCall(request).execute();
+                String result = response.body().string();//4.获得返回结果
+                //String result = "Test";
+                Log.i("-----send Reponse Body", result);
+                return unicodeToUtf8(result);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             return null;
         }
