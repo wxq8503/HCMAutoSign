@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="开启自动签到">
+        <com.hcm.hcmautosign.widget.CustomSwitchPreference
+            android:defaultValue="true"
+            android:title="HCM"
+            android:icon="@drawable/settings_ic_hcm"
+            android:key="KEY_ENABLE_HCM"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Auth Code 设置">
+        <EditTextPreference
+            android:title="Input Authorization Code"
+            android:defaultValue="b57d25ccd7a6f4e5b842e0f67425a7759aec3283"
+            android:key="KEY_AUTH_CODE"
+            android:dialogTitle="Input Authorization Code"
+            android:hint="Authorization Code"
+            android:summary="Authorization Code"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>
