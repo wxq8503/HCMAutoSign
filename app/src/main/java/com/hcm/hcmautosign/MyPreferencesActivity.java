@@ -5,8 +5,6 @@ package com.hcm.hcmautosign;
  */
 
 import android.os.Bundle;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 
 public class MyPreferencesActivity extends PreferenceActivity {

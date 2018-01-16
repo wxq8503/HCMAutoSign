@@ -16,9 +16,68 @@
             android:title="Input Authorization Code"
             android:defaultValue="b57d25ccd7a6f4e5b842e0f67425a7759aec3283"
             android:key="KEY_AUTH_CODE"
+            android:selectAllOnFocus="true"
             android:dialogTitle="Input Authorization Code"
             android:hint="Authorization Code"
             android:summary="Authorization Code"/>
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Mobike 设置">
+        <EditTextPreference
+            android:title="Input Authorization Code"
+            android:defaultValue="200"
+            android:key="KEY_BIKE_SCOPE"
+            android:selectAllOnFocus="true"
+            android:inputType="text|number"
+            android:dialogTitle="Input 查找范围半径"
+            android:hint="范围"
+            android:summary="200"/>
+        <EditTextPreference
+            android:title="Input longitude"
+            android:defaultValue="121.641999"
+            android:key="KEY_BIKE_LONGITUDE"
+            android:selectAllOnFocus="true"
+            android:inputType="text|numberDecimal"
+            android:dialogTitle="Input经度"
+            android:hint="经度"
+            android:summary="121.641999"/>
+        <EditTextPreference
+            android:title="Input latitude"
+            android:defaultValue="31.322225"
+            android:key="KEY_BIKE_LATITUDE"
+            android:selectAllOnFocus="true"
+            android:inputType="text|numberDecimal"
+            android:dialogTitle="Input纬度"
+            android:hint="纬度"
+            android:summary="31.322225"/>
+        <EditTextPreference
+            android:title="Input Bike ID"
+            android:defaultValue="N/A"
+            android:key="KEY_BIKE_ID"
+            android:selectAllOnFocus="true"
+            android:inputType="text|numberDecimal"
+            android:dialogTitle="Input预约单车的ID"
+            android:hint="预约单车的ID"
+            android:summary="预约单车的ID"/>
+
+        <EditTextPreference
+            android:title="Nearest Bike ID"
+            android:defaultValue="N/A"
+            android:key="KEY_NEAREST_BIKE_ID"
+            android:editable="false"
+            android:dialogTitle="最近单车的ID"
+            android:summary="最近单车的ID"/>
+
+        <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/pref_bike_type_titles"
+            android:entryValues="@array/pref_bike_type_values"
+            android:key="KEY_BIKE_TYPE"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="单车类型"
+            android:summary="单车类型"/>
+
+    </PreferenceCategory>
 </PreferenceScreen>

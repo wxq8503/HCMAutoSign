@@ -36,8 +36,8 @@ public class MyPreferenceFragment extends PreferenceFragment {
             }
         });
 
-        final EditTextPreference delayEditTextPre = (EditTextPreference) findPreference("KEY_AUTH_CODE");
-        delayEditTextPre.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+        final EditTextPreference authCodeEditTextPre = (EditTextPreference) findPreference("KEY_AUTH_CODE");
+        authCodeEditTextPre.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 if("0".equals(String.valueOf(newValue))) {
@@ -48,14 +48,14 @@ public class MyPreferenceFragment extends PreferenceFragment {
                 return true;
             }
         });
-
-        String delay = delayEditTextPre.getText();
+/*
+        String delay = authCodeEditTextPre.getText();
         if("0".equals(String.valueOf(delay))) {
-            delayEditTextPre.setSummary("");
+            authCodeEditTextPre.setSummary("");
         } else {
-            delayEditTextPre.setSummary(delay + "-----Click to change");
+            authCodeEditTextPre.setSummary(delay + "-----Click to change");
         }
-
+*/
     }
 
     @Override

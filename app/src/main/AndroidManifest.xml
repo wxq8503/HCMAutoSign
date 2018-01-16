@@ -28,6 +28,9 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"></activity>
+
+        <activity android:label="MoBike" android:name=".MobikeActivity"></activity>
+
     </application>
 
 </manifest>
