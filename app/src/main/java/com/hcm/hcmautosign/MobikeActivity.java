@@ -4,11 +4,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,21 +18,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -45,8 +33,12 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MobikeActivity extends AppCompatActivity implements View.OnClickListener{
-    private TextView mTextMessage;
-    private  String action;
+    private TextView mTextStatus;
+    private Button btnSearch;
+    private Button btnReserve;
+    private Button btnCancel;
+
+    private String action;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
     private String TAG = MainActivity.class.getSimpleName();
@@ -64,45 +56,83 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
         String bike_type = preferences.getString("KEY_BIKE_TYPE", "0");
         String search_scope = preferences.getString("KEY_BIKE_SCOPE", "200");
         String bike_id = preferences.getString("KEY_BIKE_ID", "N/A");
+        String nearest_bike_id = preferences.getString("KEY_NEAREST_BIKE_ID", "N/A");
+        String nearest_bike_type = preferences.getString("KEY_NEAREST_BIKE_TYPE", "N/A");
 
+        latitude = "31.260866";
+        longitude = "121.622440";
         switch (v.getId()) {
             case  R.id.btnCheck: {
                 action = "NearbyBikeCheck";
                 new  MobikeTask().execute(action, longitude, latitude, bike_type, search_scope, bike_id);
+                check_status();
                 break;
             }
 
             case R.id.btnReserve: {
                 action = "Reserve";
-                new  MobikeTask().execute(action, longitude, latitude, bike_type, search_scope, bike_id);
+                if("N/A".equals(String.valueOf(nearest_bike_id))) {
+                    Log.e(TAG, "No Nearest Bike ID Assigned: " );
+                }else{
+                    new  MobikeTask().execute(action, longitude, latitude, nearest_bike_type, search_scope, nearest_bike_id);
+                    check_status();
+                }
                 break;
             }
             case R.id.btnCancel: {
                 // do something for button 2 click
                 action = "Cancel";
-                new  MobikeTask().execute(action, longitude, latitude, bike_type, search_scope, bike_id);
+                if("N/A".equals(String.valueOf(bike_id))) {
+                    Log.e(TAG, "No Bike ID Reserved: " );
+                }else {
+                    new MobikeTask().execute(action, longitude, latitude, bike_type, search_scope, bike_id);
+                    check_status();
+                }
                 break;
             }
             //.... etc
         }
     }
 
+    public void check_status(){
+        btnReserve= findViewById(R.id.btnReserve);
+        btnCancel= findViewById(R.id.btnCancel);
+        preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        String bike_id = preferences.getString("KEY_BIKE_ID", "N/A");
+        String nearest_bike_id = preferences.getString("KEY_NEAREST_BIKE_ID", "N/A");
+        Log.i("-----Mobike bike_id", bike_id);
+        Log.i("-----Mobike nearbikeid", nearest_bike_id);
+
+        if("N/A".equals(String.valueOf(bike_id))) {
+            btnCancel.setEnabled(false);
+            if("N/A".equals(String.valueOf(nearest_bike_id))) {
+                btnReserve.setEnabled(false);
+            }else{
+                btnReserve.setEnabled(true);
+            }
+        }else{
+            btnCancel.setEnabled(true);
+            btnReserve.setEnabled(false);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mobike);
-        mTextMessage = findViewById(R.id.txtStatus);
+        mTextStatus = findViewById(R.id.txtStatus);
 
-        Button mClickButton1 = findViewById(R.id.btnCheck);
-        mClickButton1.setOnClickListener(this);
-        Button mClickButton2 = findViewById(R.id.btnReserve);
-        mClickButton2.setOnClickListener(this);
-        Button mClickButton3 = findViewById(R.id.btnCancel);
-        mClickButton3.setOnClickListener(this);
+        btnSearch = findViewById(R.id.btnCheck);
+        btnReserve= findViewById(R.id.btnReserve);
+        btnCancel= findViewById(R.id.btnCancel);
+
+        btnSearch.setOnClickListener(this);
+        btnReserve.setOnClickListener(this);
+        btnCancel.setOnClickListener(this);
 
         contactList = new ArrayList<>();
-        lv = (ListView) findViewById(R.id.list);
+        lv = findViewById(R.id.list);
+        check_status();
     }
 
     public class MobikeTask extends AsyncTask<String,String,String> {
@@ -203,14 +233,16 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
                         JSONObject c = contacts.getJSONObject(i);
                         String bike_id = c.getString("bikeIds");
                         String distance = c.getString("distance");
+                        String bike_type = c.getString("biketype");
                         // tmp hash map for single contact
                         HashMap<String, String> contact = new HashMap<>();
 
                         // adding each child node to HashMap key => value
-                        contact.put("bikeid", bike_id);
+                        contact.put("bikeid", bike_id + "--" + bike_type);
                         contact.put("distance", distance);
                         if(i==0){
                             editor.putString("KEY_NEAREST_BIKE_ID", bike_id);
+                            editor.putString("KEY_NEAREST_BIKE_TYPE", bike_type);
                             editor.commit();
                         }
 
@@ -249,13 +281,18 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
             post_body = post_body + "sign=8e92c1ce1f779bf1daa69d4ddc007e57&client_id=android";
             post_body = post_body + "&biketype=" + biketype;
             post_body = post_body + "&longitude=" + longitude;
+            post_body = post_body + "&isactive=1";
             post_body = post_body + "&latitude=" + latitude;
-            post_body = post_body + "&userid=1809516087576576328839&isactive=1";
-            post_body = post_body + "&bikeIds=" + bikeid;
+            try {
+                post_body = post_body + "&bikeIds=" + URLEncoder.encode(bikeid,"utf-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            post_body = post_body + "&userid=1809516087576576328839";
+            Log.i("-----send Request Body", "Send Request Body");
+            Log.i("-----send Request Body", post_body);
 
             RequestBody body = RequestBody.create(mediaType, post_body);
-            Log.i("-----send Request Body", "Send Request Body");
-            //DownloadManager.Request request = new DownloadManager.Request.Builder()
             Request request = new Request.Builder()
                     .url(url_str)
                     .post(body)
@@ -289,7 +326,56 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
                 String result = response.body().string();//4.获得返回结果
                 //String result = "Test";
                 Log.i("-----send Reponse Body", result);
+                try {
+                    JSONObject jsonObj = new JSONObject(result);
+                    String bike_id = jsonObj.getString("bikeId");
+                    String distance = jsonObj.getString("biketype");
+                    HashMap<String, String> contact = new HashMap<>();
 
+                    // adding each child node to HashMap key => value
+                    contact.put("bikeid", bike_id);
+                    contact.put("distance", distance);
+
+                    editor.putString("KEY_BIKE_ID", bike_id);
+                    editor.commit();
+
+                    // adding contact to contact list
+                    contactList.add(contact);
+                    /*
+                    // Getting JSON Array node
+                    JSONArray contacts = jsonObj.getJSONArray("object");
+
+                    // looping through All Contacts
+                    for (int i = 0; i < contacts.length(); i++) {
+                        JSONObject c = contacts.getJSONObject(i);
+                        String bike_id = c.getString("bikeId");
+                        String distance = c.getString("distance");
+                        // tmp hash map for single contact
+                        HashMap<String, String> contact = new HashMap<>();
+
+                        // adding each child node to HashMap key => value
+                        contact.put("bikeid", bike_id);
+                        contact.put("distance", distance);
+                        if(i==0){
+                            editor.putString("KEY_NEAREST_BIKE_ID", bike_id);
+                            editor.commit();
+                        }
+
+                        // adding contact to contact list
+                        punchinList.add(contact);
+                    }
+                    */
+                } catch (final JSONException e) {
+                    Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),
+                                    "Json parsing error: " + e.getMessage(),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
                 return unicodeToUtf8(result);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -457,7 +543,7 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            //mTextMessage.setText(result);
+            //mTextStatus.setText(result);
             ListAdapter adapter = new SimpleAdapter(MobikeActivity.this, contactList,
                     R.layout.list_item, new String[]{ "bikeid","distance"},
                     new int[]{R.id.bikeid, R.id.distance});

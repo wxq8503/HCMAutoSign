@@ -12,8 +12,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,6 +33,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -44,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTextAuth;
     private  String action;
     private SharedPreferences preferences;
+    private String TAG = MainActivity.class.getSimpleName();
+    ArrayList<HashMap<String, String>> punchinList;
+    private ListView lv;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -215,8 +222,48 @@ public class MainActivity extends AppCompatActivity {
                     while ((line = reader.readLine())!= null){
                         buffer.append(line);
                     }
-                    Log.i("-----send Flag", buffer.toString());
-                    return  unicodeToUtf8(buffer.toString());
+                    String result_utf8 = buffer.toString();
+                    Log.i("-----send Flag", result_utf8);
+                    String return_contactor = "";
+                    try {
+                        JSONObject jsonObj = new JSONObject(result_utf8);
+                        JSONObject punchinresultObj = jsonObj.getJSONObject("result");
+                        String success_flag = punchinresultObj.getString("success");
+                        Log.e(TAG, "success_flag: " + success_flag);
+                        JSONObject punchindataObj = punchinresultObj.getJSONObject("data");
+                        Log.e(TAG, "punchindataObj: " + punchindataObj);
+                        // Getting JSON Array node
+                        JSONArray punchin = punchindataObj.getJSONArray("signin");
+                        Log.e(TAG, "punchin_flag: " + punchin);
+
+                        // looping through All Contacts
+                        for (int i = 0; i < punchin.length(); i++) {
+                            JSONObject c = punchin.getJSONObject(i);
+                            String source = c.getString("source");
+                            String time = c.getString("time");
+                            return_contactor = return_contactor + source + "|" + time + "|";
+                            // tmp hash map for single contact
+                            HashMap<String, String> punch_item = new HashMap<>();
+
+                            // adding each child node to HashMap key => value
+                            punch_item.put("source", source);
+                            punch_item.put("time", time);
+
+                            // adding contact to contact list
+                            //punchinList.add(punch_item);
+                        }
+                    } catch (final JSONException e) {
+                        Log.e(TAG, "Json parsing error: " + e.getMessage());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(),
+                                        "Json parsing error: " + e.getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                    return  return_contactor;
 
                 } else {
                     Log.i("-----send Code", Integer.toString(code));
@@ -447,9 +494,40 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Response response = client.newCall(request).execute();
                 String result = response.body().string();//4.获得返回结果
+                result = unicodeToUtf8(result);
                 //String result = "Test";
                 Log.i("-----send Reponse Body", result);
-                return unicodeToUtf8(result);
+                String return_contact = "";
+                try {
+                    JSONObject jsonObj = new JSONObject(result);
+                    JSONObject jsonCheckresultObj = jsonObj.getJSONObject("result");
+                    Log.e(TAG, "Json result: " + jsonCheckresultObj);
+
+                    String check_flag = jsonCheckresultObj.getString("success");
+                    Log.e(TAG, "Json check flag: " + check_flag);
+
+                    JSONObject jsonLocationObj = jsonCheckresultObj.getJSONObject("location");
+
+                    String address = jsonLocationObj.getString("address");
+                    String distance = jsonLocationObj.getString("distance");
+                    HashMap<String, String> punchin = new HashMap<>();
+                    // adding each child node to HashMap key => value
+                    punchin.put("address", address);
+                    punchin.put("distance", distance);
+                    //punchinList.add(punchin);
+                    return_contact = check_flag + "|打卡地点:" + address + "|距离目标:"+ distance + "米";
+                } catch (final JSONException e) {
+                    Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),
+                                    "Json parsing error: " + e.getMessage(),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+                return return_contact;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -503,9 +581,38 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Response response = client.newCall(request).execute();
                 String result = response.body().string();//4.获得返回结果
+                result = unicodeToUtf8(result);
                 //String result = "Test";
                 Log.i("-----send Reponse Body", result);
-                return unicodeToUtf8(result);
+                String return_contact = "";
+                try {
+                    JSONObject jsonObj = new JSONObject(result);
+                    JSONObject jsonCheckresultObj = jsonObj.getJSONObject("result");
+                    Log.e(TAG, "Json result: " + jsonCheckresultObj);
+
+                    String check_flag = jsonCheckresultObj.getString("success");
+                    Log.e(TAG, "Json check flag: " + check_flag);
+
+                    JSONObject jsonPunchinObj = jsonCheckresultObj.getJSONObject("punchin");
+
+                    String count = jsonPunchinObj.getString("count");
+                    String index = jsonPunchinObj.getString("index");
+                    String firsttime = jsonPunchinObj.getString("firsttime");
+                    String address = jsonPunchinObj.getString("address");
+                    String time = jsonPunchinObj.getString("time");
+                    return_contact = check_flag + "|打卡地点:" + address + "|排名:"+ index + "|今日打卡次数:" + count + "|签到时间:" + firsttime + "|本次打卡时间:" + time;
+                } catch (final JSONException e) {
+                    Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),
+                                    "Json parsing error: " + e.getMessage(),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+                return return_contact;
             } catch (IOException e) {
                 e.printStackTrace();
             }

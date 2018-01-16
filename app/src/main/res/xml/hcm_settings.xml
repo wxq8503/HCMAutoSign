@@ -14,7 +14,7 @@
     <PreferenceCategory android:title="Auth Code 设置">
         <EditTextPreference
             android:title="Input Authorization Code"
-            android:defaultValue="b57d25ccd7a6f4e5b842e0f67425a7759aec3283"
+            android:defaultValue="c4be3db57de41f516fd41ad9af83b3b3db362756"
             android:key="KEY_AUTH_CODE"
             android:selectAllOnFocus="true"
             android:dialogTitle="Input Authorization Code"
@@ -23,6 +23,12 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Mobike 设置">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="KEY_BIKE_USE_GPS"
+            android:summary="USE GPS"
+            android:title="USE GPS Location" />
+
         <EditTextPreference
             android:title="Input Authorization Code"
             android:defaultValue="200"
@@ -55,6 +61,8 @@
             android:defaultValue="N/A"
             android:key="KEY_BIKE_ID"
             android:selectAllOnFocus="true"
+            android:editable="false"
+            android:enabled="false"
             android:inputType="text|numberDecimal"
             android:dialogTitle="Input预约单车的ID"
             android:hint="预约单车的ID"
@@ -65,6 +73,7 @@
             android:defaultValue="N/A"
             android:key="KEY_NEAREST_BIKE_ID"
             android:editable="false"
+            android:enabled="false"
             android:dialogTitle="最近单车的ID"
             android:summary="最近单车的ID"/>
 
@@ -78,6 +87,18 @@
             android:positiveButtonText="@null"
             android:title="单车类型"
             android:summary="单车类型"/>
-
+        <EditTextPreference
+            android:title="SIGN"
+            android:defaultValue="8e92c1ce1f779bf1daa69d4ddc007e57"
+            android:key="KEY_BIKE_SIGN"
+            android:dialogTitle="SIGN"
+            android:summary="SIGN"/>
+        <EditTextPreference
+            android:title="USER ID"
+            android:defaultValue="1809516087576576328839"
+            android:inputType="text|number"
+            android:key="KEY_BIKE_USER_ID"
+            android:dialogTitle="USER_ID"
+            android:summary="User ID"/>
     </PreferenceCategory>
 </PreferenceScreen>
