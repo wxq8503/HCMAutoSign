@@ -1,51 +1,27 @@
 package com.hcm.hcmautosign;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
-import android.widget.Switch;
 
 /**
  * Created by weia on 2018/1/10.
  */
 
-public class MyPreferenceFragment extends PreferenceFragment {
-
+public class MobikePreferenceFragment extends PreferenceFragment {
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.hcm_settings);
+        addPreferencesFromResource(R.xml.mobike_settings);
 
-        EditTextPreference authCodeEditTextPre = (EditTextPreference) findPreference("KEY_AUTH_CODE");
         EditTextPreference editTextPreference_LONGITUDE = (EditTextPreference) findPreference("KEY_BIKE_LONGITUDE");
         EditTextPreference editTextPreference_LATITUDE = (EditTextPreference) findPreference("KEY_BIKE_LATITUDE");
         EditTextPreference editTextPreference_RESERVED_BIKE_ID = (EditTextPreference) findPreference("KEY_BIKE_ID");
         EditTextPreference editTextPreference_NEAREST_BIKE_ID = (EditTextPreference) findPreference("KEY_NEAREST_BIKE_ID");
-        /*
-        authCodeEditTextPre.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                if("0".equals(String.valueOf(newValue))) {
-                    preference.setSummary("");
-                } else {
-                    preference.setSummary(newValue + "------Click to change");
-                }
-                return true;
-            }
-        });
-*/
-        String auth_code = authCodeEditTextPre.getText();
-        if("0".equals(String.valueOf(auth_code))) {
-            authCodeEditTextPre.setSummary("");
-        } else {
-            authCodeEditTextPre.setSummary(auth_code + "-----Click to change");
-        }
 
         String LONGITUDE = editTextPreference_LONGITUDE.getText();
         if("0".equals(String.valueOf(LONGITUDE))) {
@@ -81,11 +57,8 @@ public class MyPreferenceFragment extends PreferenceFragment {
                                          Preference preference) {
         EditTextPreference editTextPreference_LONGITUDE = (EditTextPreference) findPreference("KEY_BIKE_LONGITUDE");
         EditTextPreference editTextPreference_LATITUDE = (EditTextPreference) findPreference("KEY_BIKE_LATITUDE");
-        //如果“保存个人信息”这个按钮被选中，将进行括号里面的操作
+
         switch(preference.getKey()){
-            case "KEY_ENABLE_HCM": {
-                break;
-            }
 
             case "KEY_BIKE_USE_GPS": {
                 boolean checked = ((SwitchPreference) preference).isChecked();
@@ -99,16 +72,6 @@ public class MyPreferenceFragment extends PreferenceFragment {
                 break;
             }
 
-            case "KEY_AUTH_CODE": {
-                EditTextPreference authCodeEditTextPre = (EditTextPreference) findPreference("KEY_AUTH_CODE");
-                String newValue = authCodeEditTextPre.getText();
-                if("0".equals(String.valueOf(newValue))) {
-                    preference.setSummary("");
-                } else {
-                    preference.setSummary(newValue + "------Click to change");
-                }
-                break;
-            }
             case "KEY_BIKE_SIGN": {
                 EditTextPreference signCodeEditTextPre = (EditTextPreference) findPreference("KEY_BIKE_SIGN");
                 String newValue = signCodeEditTextPre.getText();

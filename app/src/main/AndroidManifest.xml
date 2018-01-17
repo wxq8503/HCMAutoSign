@@ -5,6 +5,9 @@
     <!-- 配置权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/launch_icon"
@@ -21,7 +24,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MyPreferencesActivity" />
+        <activity android:name=".HCMPreferencesActivity" />
+        <activity android:name=".MobikePreferencesActivity" />
 
         <service android:name=".HCMAutoSignService"></service>
 
@@ -30,7 +34,7 @@
             android:label="@string/title_activity_settings"></activity>
 
         <activity android:label="MoBike" android:name=".MobikeActivity"></activity>
-
+        <activity android:label="MoBike" android:name=".GPSActivity"></activity>
     </application>
 
 </manifest>

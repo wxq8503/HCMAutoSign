@@ -28,6 +28,20 @@
         android:layout_height="wrap_content"
         android:text="取消预约" />
 
+    <Button
+        android:id="@+id/btnMobikeSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="getMobikeSettingsFragment"
+        android:text="Setting" />
+
+    <Button
+        android:id="@+id/btnGPSSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="goGPSActivity"
+        android:text="GPS" />
+
     <TextView
         android:id="@+id/txtStatus"
         android:layout_width="wrap_content"

@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory
-        android:title="开启自动签到">
-        <com.hcm.hcmautosign.widget.CustomSwitchPreference
+    <PreferenceCategory android:title="HCM Setting">
+        <SwitchPreference
             android:defaultValue="true"
             android:title="HCM"
             android:icon="@drawable/settings_ic_hcm"
-            android:key="KEY_ENABLE_HCM"/>
+            android:key="KEY_ENABLE_HCM" />
 
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="Auth Code 设置">
         <EditTextPreference
             android:title="Input Authorization Code"
             android:defaultValue="c4be3db57de41f516fd41ad9af83b3b3db362756"
@@ -22,83 +18,4 @@
             android:summary="Authorization Code"/>
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Mobike 设置">
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="KEY_BIKE_USE_GPS"
-            android:summary="USE GPS"
-            android:title="USE GPS Location" />
-
-        <EditTextPreference
-            android:title="Input Authorization Code"
-            android:defaultValue="200"
-            android:key="KEY_BIKE_SCOPE"
-            android:selectAllOnFocus="true"
-            android:inputType="text|number"
-            android:dialogTitle="Input 查找范围半径"
-            android:hint="范围"
-            android:summary="200"/>
-        <EditTextPreference
-            android:title="Input longitude"
-            android:defaultValue="121.641999"
-            android:key="KEY_BIKE_LONGITUDE"
-            android:selectAllOnFocus="true"
-            android:inputType="text|numberDecimal"
-            android:dialogTitle="Input经度"
-            android:hint="经度"
-            android:summary="121.641999"/>
-        <EditTextPreference
-            android:title="Input latitude"
-            android:defaultValue="31.322225"
-            android:key="KEY_BIKE_LATITUDE"
-            android:selectAllOnFocus="true"
-            android:inputType="text|numberDecimal"
-            android:dialogTitle="Input纬度"
-            android:hint="纬度"
-            android:summary="31.322225"/>
-        <EditTextPreference
-            android:title="Input Bike ID"
-            android:defaultValue="N/A"
-            android:key="KEY_BIKE_ID"
-            android:selectAllOnFocus="true"
-            android:editable="false"
-            android:enabled="false"
-            android:inputType="text|numberDecimal"
-            android:dialogTitle="Input预约单车的ID"
-            android:hint="预约单车的ID"
-            android:summary="预约单车的ID"/>
-
-        <EditTextPreference
-            android:title="Nearest Bike ID"
-            android:defaultValue="N/A"
-            android:key="KEY_NEAREST_BIKE_ID"
-            android:editable="false"
-            android:enabled="false"
-            android:dialogTitle="最近单车的ID"
-            android:summary="最近单车的ID"/>
-
-        <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
-        <ListPreference
-            android:defaultValue="1"
-            android:entries="@array/pref_bike_type_titles"
-            android:entryValues="@array/pref_bike_type_values"
-            android:key="KEY_BIKE_TYPE"
-            android:negativeButtonText="@null"
-            android:positiveButtonText="@null"
-            android:title="单车类型"
-            android:summary="单车类型"/>
-        <EditTextPreference
-            android:title="SIGN"
-            android:defaultValue="8e92c1ce1f779bf1daa69d4ddc007e57"
-            android:key="KEY_BIKE_SIGN"
-            android:dialogTitle="SIGN"
-            android:summary="SIGN"/>
-        <EditTextPreference
-            android:title="USER ID"
-            android:defaultValue="1809516087576576328839"
-            android:inputType="text|number"
-            android:key="KEY_BIKE_USER_ID"
-            android:dialogTitle="USER_ID"
-            android:summary="User ID"/>
-    </PreferenceCategory>
 </PreferenceScreen>

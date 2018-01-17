@@ -1,5 +1,6 @@
 package com.hcm.hcmautosign;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -91,6 +92,20 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
                 break;
             }
             //.... etc
+        }
+    }
+
+    public void getMobikeSettingsFragment(View view) {
+        Intent launchIntent = new Intent(this, MobikePreferencesActivity.class);
+        if (launchIntent != null) {
+            startActivity(launchIntent);//null pointer check in case package name was not found
+        }
+    }
+
+    public void goGPSActivity(View view) {
+        Intent launchIntent = new Intent(this, GPSActivity.class);
+        if (launchIntent != null) {
+            startActivity(launchIntent);//null pointer check in case package name was not found
         }
     }
 
@@ -545,7 +560,7 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
             super.onPostExecute(result);
             //mTextStatus.setText(result);
             ListAdapter adapter = new SimpleAdapter(MobikeActivity.this, contactList,
-                    R.layout.list_item, new String[]{ "bikeid","distance"},
+                    R.layout.mobike_list_item, new String[]{ "bikeid","distance"},
                     new int[]{R.id.bikeid, R.id.distance});
             lv.setAdapter(adapter);
         }

@@ -12,7 +12,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,11 +47,11 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
-    private TextView mTextAuth;
+    //private TextView mTextAuth;
     private  String action;
     private SharedPreferences preferences;
     private String TAG = MainActivity.class.getSimpleName();
-    ArrayList<HashMap<String, String>> punchinList;
+    ArrayList<HashMap<String, String>> resultList;
     private ListView lv;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -57,12 +59,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            String strAuthorization = mTextAuth.getText().toString();
+            //String strAuthorization = mTextAuth.getText().toString();
 
             preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            String authorization = preferences.getString("KEY_AUTH_CODE", strAuthorization);
-            mTextAuth.setText(authorization);
-
+            String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
+            //mTextAuth.setText(authorization);
+            resultList = new ArrayList<>();
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     mTextMessage.setText(R.string.title_home);
@@ -91,30 +93,30 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mTextMessage = findViewById(R.id.message);
-        mTextAuth   = findViewById(R.id.txtAuth);
 
-        String strAuthorization = mTextAuth.getText().toString();
+        //String strAuthorization = mTextAuth.getText().toString();
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String authorization = SP.getString("KEY_AUTH_CODE", strAuthorization);
-        mTextAuth.setText(authorization);
+        String authorization = SP.getString("KEY_AUTH_CODE", "N/A");
+        //mTextAuth.setText(authorization);
+
+        lv = findViewById(R.id.hcm_list);
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
-    public void getSettingsFragment(View view) {
-
-        Intent launchIntent = new Intent(this, MyPreferencesActivity.class);
+    public void getHCMSettingsFragment(View view) {
+        Intent launchIntent = new Intent(this, HCMPreferencesActivity.class);
         if (launchIntent != null) {
             startActivity(launchIntent);//null pointer check in case package name was not found
         }
     }
 
     public void getAuthCode(View view) {
-        String strAuthorization = mTextAuth.getText().toString();
+        //String strAuthorization = mTextAuth.getText().toString();
         preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String authorization = preferences.getString("KEY_AUTH_CODE", strAuthorization);
-        mTextAuth.setText(authorization);
+        String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
+        //mTextAuth.setText(authorization);
     }
 
     public void goMoBike(View view) {
@@ -122,11 +124,6 @@ public class MainActivity extends AppCompatActivity {
         if (launchIntent != null) {
             startActivity(launchIntent);//null pointer check in case package name was not found
         }
-
-        String strAuthorization = mTextAuth.getText().toString();
-        preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String authorization = preferences.getString("KEY_AUTH_CODE", strAuthorization);
-        mTextAuth.setText(authorization);
     }
 
     public class JSONTask extends AsyncTask<String,String,String> {
@@ -246,11 +243,10 @@ public class MainActivity extends AppCompatActivity {
                             HashMap<String, String> punch_item = new HashMap<>();
 
                             // adding each child node to HashMap key => value
-                            punch_item.put("source", source);
-                            punch_item.put("time", time);
+                            punch_item.put("item", String.valueOf(i + 1));
+                            punch_item.put("note", source + " | " + time);
 
-                            // adding contact to contact list
-                            //punchinList.add(punch_item);
+                            resultList.add(punch_item);
                         }
                     } catch (final JSONException e) {
                         Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -510,12 +506,15 @@ public class MainActivity extends AppCompatActivity {
 
                     String address = jsonLocationObj.getString("address");
                     String distance = jsonLocationObj.getString("distance");
-                    HashMap<String, String> punchin = new HashMap<>();
+                    HashMap<String, String> punch_item = new HashMap<>();
+
                     // adding each child node to HashMap key => value
-                    punchin.put("address", address);
-                    punchin.put("distance", distance);
-                    //punchinList.add(punchin);
-                    return_contact = check_flag + "|打卡地点:" + address + "|距离目标:"+ distance + "米";
+                    punch_item.put("item", "1");
+                    punch_item.put("note", "打卡地点:" + address + "| 距离打卡点:"+ distance + "米");
+
+                    resultList.add(punch_item);
+
+                    return_contact = check_flag + "|打卡地点:" + address + "| 距离目标:"+ distance + "米";
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
                     runOnUiThread(new Runnable() {
@@ -600,6 +599,32 @@ public class MainActivity extends AppCompatActivity {
                     String firsttime = jsonPunchinObj.getString("firsttime");
                     String address = jsonPunchinObj.getString("address");
                     String time = jsonPunchinObj.getString("time");
+
+                    HashMap<String, String> punch_item = new HashMap<>();
+                    punch_item.put("item", "打卡地点");
+                    punch_item.put("note", address);
+                    resultList.add(punch_item);
+
+                    HashMap<String, String> punch_item1 = new HashMap<>();
+                    punch_item1.put("item", "排名");
+                    punch_item1.put("note", index);
+                    resultList.add(punch_item1);
+
+                    HashMap<String, String> punch_item2 = new HashMap<>();
+                    punch_item2.put("item", "今日打卡次数");
+                    punch_item2.put("note", count);
+                    resultList.add(punch_item2);
+
+                    HashMap<String, String> punch_item3 = new HashMap<>();
+                    punch_item3.put("item", "第一次打卡时间");
+                    punch_item3.put("note", firsttime);
+                    resultList.add(punch_item3);
+
+                    HashMap<String, String> punch_item4 = new HashMap<>();
+                    punch_item4.put("item", "本次打卡时间");
+                    punch_item4.put("note", time);
+                    resultList.add(punch_item4);
+
                     return_contact = check_flag + "|打卡地点:" + address + "|排名:"+ index + "|今日打卡次数:" + count + "|签到时间:" + firsttime + "|本次打卡时间:" + time;
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -723,7 +748,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            mTextMessage.setText(result);
+            //mTextMessage.setText(result);
+            ListAdapter adapter = new SimpleAdapter(MainActivity.this, resultList, R.layout.hcm_list_item, new String[]{ "item","note"}, new int[]{R.id.item, R.id.note});
+            lv.setAdapter(adapter);
         }
     }
 
