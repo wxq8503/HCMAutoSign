@@ -52,16 +52,18 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
         preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         editor = preferences.edit();
 
-        String longitude = preferences.getString("KEY_BIKE_LONGITUDE", "121.641999");
-        String latitude = preferences.getString("KEY_BIKE_LATITUDE", "31.322225");
+        String longitude;
+        longitude = preferences.getString("KEY_BIKE_LONGITUDE", "121.641999");
+        String latitude;
+        latitude = preferences.getString("KEY_BIKE_LATITUDE", "31.322225");
         String bike_type = preferences.getString("KEY_BIKE_TYPE", "0");
         String search_scope = preferences.getString("KEY_BIKE_SCOPE", "200");
         String bike_id = preferences.getString("KEY_BIKE_ID", "N/A");
         String nearest_bike_id = preferences.getString("KEY_NEAREST_BIKE_ID", "N/A");
         String nearest_bike_type = preferences.getString("KEY_NEAREST_BIKE_TYPE", "N/A");
 
-        latitude = "31.260866";
-        longitude = "121.622440";
+        //latitude = "31.260866";
+        //longitude = "121.622440";
         switch (v.getId()) {
             case  R.id.btnCheck: {
                 action = "NearbyBikeCheck";
@@ -75,8 +77,11 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
                 if("N/A".equals(String.valueOf(nearest_bike_id))) {
                     Log.e(TAG, "No Nearest Bike ID Assigned: " );
                 }else{
-                    new  MobikeTask().execute(action, longitude, latitude, nearest_bike_type, search_scope, nearest_bike_id);
-                    check_status();
+                    //new  MobikeTask().execute(action, longitude, latitude, nearest_bike_type, search_scope, nearest_bike_id);
+                    //check_status();
+                    Toast.makeText(getApplicationContext(),
+                            "Sorry, I'm not ready yet!",
+                            Toast.LENGTH_LONG).show();
                 }
                 break;
             }
@@ -91,7 +96,6 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
                 }
                 break;
             }
-            //.... etc
         }
     }
 
@@ -103,10 +107,15 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void goGPSActivity(View view) {
-        Intent launchIntent = new Intent(this, GPSActivity.class);
+        Toast.makeText(getApplicationContext(),
+                "Something will be added! " ,
+                Toast.LENGTH_LONG).show();
+        /*
+        Intent launchIntent = new Intent(this, LocationActivity.class);
         if (launchIntent != null) {
             startActivity(launchIntent);//null pointer check in case package name was not found
         }
+        */
     }
 
     public void check_status(){
@@ -254,7 +263,7 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
 
                         // adding each child node to HashMap key => value
                         contact.put("bikeid", bike_id + "--" + bike_type);
-                        contact.put("distance", distance);
+                        contact.put("distance", "距离 " + distance + "米");
                         if(i==0){
                             editor.putString("KEY_NEAREST_BIKE_ID", bike_id);
                             editor.putString("KEY_NEAREST_BIKE_TYPE", bike_type);
@@ -353,33 +362,8 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
 
                     editor.putString("KEY_BIKE_ID", bike_id);
                     editor.commit();
-
-                    // adding contact to contact list
                     contactList.add(contact);
-                    /*
-                    // Getting JSON Array node
-                    JSONArray contacts = jsonObj.getJSONArray("object");
 
-                    // looping through All Contacts
-                    for (int i = 0; i < contacts.length(); i++) {
-                        JSONObject c = contacts.getJSONObject(i);
-                        String bike_id = c.getString("bikeId");
-                        String distance = c.getString("distance");
-                        // tmp hash map for single contact
-                        HashMap<String, String> contact = new HashMap<>();
-
-                        // adding each child node to HashMap key => value
-                        contact.put("bikeid", bike_id);
-                        contact.put("distance", distance);
-                        if(i==0){
-                            editor.putString("KEY_NEAREST_BIKE_ID", bike_id);
-                            editor.commit();
-                        }
-
-                        // adding contact to contact list
-                        punchinList.add(contact);
-                    }
-                    */
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
                     runOnUiThread(new Runnable() {

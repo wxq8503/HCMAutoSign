@@ -59,28 +59,37 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            //String strAuthorization = mTextAuth.getText().toString();
-
-            preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            //preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
             String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
-            //mTextAuth.setText(authorization);
+            String longitude;
+            longitude = preferences.getString("KEY_PUNCHIN_LONGITUDE", "121.622440");
+            String latitude;
+            latitude = preferences.getString("KEY_PUNCHIN_LATITUDE", "31.260886");
+
+            if("N/A".equals(authorization)){
+                Toast.makeText(getApplicationContext(),
+                        "Can not find the authrization code,\n Please update the code first!",
+                        Toast.LENGTH_LONG).show();
+                return false;
+            }
+
             resultList = new ArrayList<>();
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
+                    mTextMessage.setText("检查打卡点");
                     action = "GeoCheck";
-                    new JSONTask().execute(action, authorization);
+                    new JSONTask().execute(action, authorization, longitude, latitude);
                     return true;
                 case R.id.navigation_dashboard:
                     mTextMessage.setText(R.string.title_dashboard);
                     action = "Punchin";
-                    new JSONTask().execute(action, authorization);
+                    new JSONTask().execute(action, authorization, longitude, latitude);
                     //return HCM_Punchin_OKHttp();
                     return true;
                 case R.id.navigation_notifications:
                     mTextMessage.setText(R.string.title_notifications);
                     action = "PunCheck";
-                    new JSONTask().execute(action, authorization);
+                    new JSONTask().execute(action, authorization, longitude, latitude);
                     return true;
             }
             return false;
@@ -93,11 +102,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mTextMessage = findViewById(R.id.message);
-
-        //String strAuthorization = mTextAuth.getText().toString();
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String authorization = SP.getString("KEY_AUTH_CODE", "N/A");
-        //mTextAuth.setText(authorization);
+        preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
+        mTextMessage.setText(authorization);
 
         lv = findViewById(R.id.hcm_list);
 
@@ -110,13 +117,6 @@ public class MainActivity extends AppCompatActivity {
         if (launchIntent != null) {
             startActivity(launchIntent);//null pointer check in case package name was not found
         }
-    }
-
-    public void getAuthCode(View view) {
-        //String strAuthorization = mTextAuth.getText().toString();
-        preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
-        //mTextAuth.setText(authorization);
     }
 
     public void goMoBike(View view) {
@@ -139,14 +139,16 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
             try {
                 String authorization =  params[1];
+                String longitude = params[2];
+                String latitude = params[3];
 
                 if(params[0].equals("GeoCheck" )) {
                     Log.i("-----send action", "GeoCheck");
-                    return HCM_GeoCheck_OKHttp(authorization);
+                    return HCM_GeoCheck_OKHttp(authorization, longitude, latitude);
                 }
                 if(params[0].equals("Punchin")) {
                     Log.i("-----send action", "Punchin");
-                    return HCM_Punchin_OKHttp(authorization);
+                    return HCM_Punchin_OKHttp(authorization, longitude, latitude);
                 }
                 if(params[0].equals("PunCheck")) {
                     Log.i("-----send action", "PunCheck");
@@ -197,8 +199,8 @@ public class MainActivity extends AppCompatActivity {
                 connection.setRequestProperty("referer", "https://servicewechat.com/wx3b6d85db7f8fb428/4/page-frame.html");
                 connection.setRequestProperty("authorization", authorization);
                 connection.setRequestProperty("Content-Type", "application/json");
-                //connection.setRequestProperty("ser-Agent", "Mozilla/5.0 (Linux; Android 5.1; SM-J5008 Build/LMY47O; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.49 Mobile MQQBrowser/6.2 TBS/043613 Safari/537.36 MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN");
-                //connection.setRequestProperty("Connection", "Keep-Alive");
+                connection.setRequestProperty("user-Agent", user_agent);
+                connection.setRequestProperty("Connection", "Keep-Alive");
                 connection.setRequestProperty("host", "open.hcmcloud.cn");
                 //connection.setRequestProperty("content-length", "129");
                 connection.setRequestProperty("cache-control", "no-cache");
@@ -319,139 +321,12 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
 
-        public String HCM_GeoCheck(String authorization) {
-            BufferedReader reader;
-            OutputStream os = null;
-            InputStream is = null;
+        public String HCM_GeoCheck_OKHttp(String authorization, String longitude, String latitude){
             String url_str = "https://open.hcmcloud.cn/api/attend.signin.geocheck";
             String name = "hcm cloud";
             String accuracy = "0";
-            String latitude = "31.260886";
-            String longitude = "121.62253";
-            Long tsLong = System.currentTimeMillis();
-            String timestamp = tsLong.toString();
-
-            //timestamp ="1513039572365";
-            List<String> hash_text_list = new ArrayList<>();
-            hash_text_list.add(latitude);
-            hash_text_list.add(longitude);
-            hash_text_list.add(accuracy);
-            hash_text_list.add(timestamp);
-            hash_text_list.add(name);
-            String hash_text_joined = TextUtils.join("", hash_text_list);
-            String hash_text = md5(hash_text_joined);
-            Log.i("-----send timestamp", timestamp);
-            Log.i("-----send Hash text", hash_text_joined);
-            Log.i("-----send Hashed", hash_text);
-            HttpURLConnection connection = null;
-            try {
-                JSONObject ClientKey = new JSONObject();
-                ClientKey.put("accuracy", accuracy);
-                ClientKey.put("latitude", latitude);
-                ClientKey.put("longitude", longitude);
-                ClientKey.put("timestamp", timestamp);
-                ClientKey.put("hash", hash_text);
-                String content = String.valueOf(ClientKey);
-                Log.i("-----send content", content);
-                URL url = new URL(url_str);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setConnectTimeout(10000);
-                connection.setDoOutput(true);
-                connection.setRequestMethod("POST");
-
-                connection.setRequestProperty("Charset", "UTF-8");
-                //connection.setRequestProperty("accept-encoding", "gzip");
-                connection.setRequestProperty("referer", "https://servicewechat.com/wx3b6d85db7f8fb428/4/page-frame.html");
-                connection.setRequestProperty("authorization", authorization);
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("ser-Agent", user_agent);
-                //connection.setRequestProperty("Connection", "Keep-Alive");
-                connection.setRequestProperty("host", "open.hcmcloud.cn");
-                //connection.setRequestProperty("content-length", "129");
-                connection.setRequestProperty("cache-control", "no-cache");
-
-                os = connection.getOutputStream();
-                os.write(content.getBytes());
-                os.flush();
-                os.close();
-                // 定义BufferedReader输入流来读取URL的响应
-                Log.i("-----send", "end");
-                int code = connection.getResponseCode();
-                if (code == 200) {
-                    InputStream stream = connection.getInputStream();
-                    reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
-
-                    StringBuffer buffer = new StringBuffer();
-                    String line ;
-                    while ((line = reader.readLine())!= null){
-                        buffer.append(line);
-                    }
-                    Log.i("-----send Flag", buffer.toString());
-                    return  unicodeToUtf8(buffer.toString());
-
-                } else {
-                    Log.i("-----send Code", Integer.toString(code));
-                    Log.i("-----send Flag", "数据提交失败");
-                    return "数据提交失败:" + Integer.toString(code);
-                    /*
-                    InputStream stream = connection.getInputStream();
-                    reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
-
-                    StringBuffer buffer = new StringBuffer();
-                    String line ;
-                    while ((line = reader.readLine())!= null){
-                        buffer.append(line);
-                    }
-                    Log.i("-----send Flag", buffer.toString());
-                    return  unicodeToUtf8(buffer.toString());
-                   */
-                }
-            } catch (SocketTimeoutException e) {
-                Log.i("-----send Error", "连接时间超时");
-                e.printStackTrace();
-
-            } catch (MalformedURLException e) {
-                Log.i("-----send Error", "Malformed");
-                e.printStackTrace();
-
-            } catch (ProtocolException e) {
-                Log.i("-----send Error", "Protocol");
-                e.printStackTrace();
-
-            } catch (IOException e) {
-                Log.i("-----send Error", "IO");
-                e.printStackTrace();
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.i("-----send Error", "JSON");
-            } catch (Exception e) {
-                Log.i("-----send Error", "Other" + e.toString());
-                e.printStackTrace();
-            } finally {// 使用finally块来关闭输出流、输入流
-                try {
-                    if (connection!= null) {
-                        connection.disconnect();
-                    }
-                    if (os != null) {
-                        os.close();
-                    }
-                    if (is != null) {
-                        is.close();
-                    }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        public String HCM_GeoCheck_OKHttp(String authorization){
-            String url_str = "https://open.hcmcloud.cn/api/attend.signin.geocheck";
-            String name = "hcm cloud";
-            String accuracy = "0";
-            String latitude = "31.260886";
-            String longitude = "121.62253";
+            //String latitude = "31.260886";
+            //String longitude = "121.62253";
             Long tsLong = System.currentTimeMillis();
             String timestamp = tsLong.toString();
             List<String> hash_text_list = new ArrayList<>();
@@ -470,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
 
             OkHttpClient client = new OkHttpClient();
             MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
-            RequestBody body = RequestBody.create(mediaType, "{\"latitude\":\"31.260886\",\"longitude\":\"121.62253\",\"accuracy\":0,\"timestamp\":" + timestamp + ",\"hash\":\"" + hash_text + "\"}");
+            RequestBody body = RequestBody.create(mediaType, "{\"latitude\":\"" + latitude + "\",\"longitude\":\"" + longitude + "\",\"accuracy\":0,\"timestamp\":" + timestamp + ",\"hash\":\"" + hash_text + "\"}");
             Log.i("-----send Request Body", "Send Request Body");
             //DownloadManager.Request request = new DownloadManager.Request.Builder()
             Request request = new Request.Builder()
@@ -509,9 +384,8 @@ public class MainActivity extends AppCompatActivity {
                     HashMap<String, String> punch_item = new HashMap<>();
 
                     // adding each child node to HashMap key => value
-                    punch_item.put("item", "1");
-                    punch_item.put("note", "打卡地点:" + address + "| 距离打卡点:"+ distance + "米");
-
+                    punch_item.put("item", "状态OK");
+                    punch_item.put("note", "目标打卡点:" + address + " | 当前距离打卡点:"+ distance + "米");
                     resultList.add(punch_item);
 
                     return_contact = check_flag + "|打卡地点:" + address + "| 距离目标:"+ distance + "米";
@@ -533,13 +407,13 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
 
-        public String HCM_Punchin_OKHttp(String authorization){
+        public String HCM_Punchin_OKHttp(String authorization, String longitude, String latitude){
             String url_str = "https://open.hcmcloud.cn/api/attend.signin.create";
             String name = "hcm cloud";
             String location_id = "3218";
             String type = "3";
-            String latitude = "31.260866";
-            String longitude = "121.622440";
+            //String latitude = "31.260866";
+            //String longitude = "121.622440";
             Long tsLong = System.currentTimeMillis();
             String timestamp = tsLong.toString();
             //timestamp ="1513039572365";
@@ -560,7 +434,7 @@ public class MainActivity extends AppCompatActivity {
 
             OkHttpClient client = new OkHttpClient();
             MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
-            RequestBody body = RequestBody.create(mediaType, "{\"location_id\":3218,\"type\":3,\"latitude\":\"31.260866\",\"longitude\":\"121.622440\",\"beacon\":\"\",\"information\":\"{}\",\"timestamp\":"+  timestamp +  ",\"state\":null,\"hash\":\"" + hash_text + "\"}");
+            RequestBody body = RequestBody.create(mediaType, "{\"location_id\":3218,\"type\":3,\"latitude\":\"" + latitude + "\",\"longitude\":\"" + longitude + "\",\"beacon\":\"\",\"information\":\"{}\",\"timestamp\":"+  timestamp +  ",\"state\":null,\"hash\":\"" + hash_text + "\"}");
             Log.i("-----send Request Body", "Send Request Body");
             //DownloadManager.Request request = new DownloadManager.Request.Builder()
             Request request = new Request.Builder()

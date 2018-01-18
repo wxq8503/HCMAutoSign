@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        release {
+            keyAlias 'hcm'
+            keyPassword 'hcmautosign'
+            storeFile file('D:/00_AlanWei/Resources/Android/key/myfirstkey.jks')
+            storePassword 'myfirstkey'
+        }
+    }
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.hcm.hcmautosign"
@@ -14,6 +22,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.release
         }
     }
 }
@@ -29,4 +40,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     compile 'com.squareup.okhttp3:okhttp:3.9.1'
     compile 'com.squareup.okio:okio:1.13.0'
+    //compile files('libs/BaiduLBS_Android.jar')
 }

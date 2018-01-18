@@ -1,9 +1,12 @@
 package com.hcm.hcmautosign;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 
@@ -11,17 +14,28 @@ import android.preference.SwitchPreference;
  * Created by weia on 2018/1/10.
  */
 
-public class MobikePreferenceFragment extends PreferenceFragment {
+public class MobikePreferenceFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener  {
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.mobike_settings);
+        PreferenceManager.setDefaultValues(getContext(), R.xml.mobike_settings, false);
 
+        EditTextPreference editTextPreference_SCOPE = (EditTextPreference) findPreference("KEY_BIKE_SCOPE");
         EditTextPreference editTextPreference_LONGITUDE = (EditTextPreference) findPreference("KEY_BIKE_LONGITUDE");
         EditTextPreference editTextPreference_LATITUDE = (EditTextPreference) findPreference("KEY_BIKE_LATITUDE");
         EditTextPreference editTextPreference_RESERVED_BIKE_ID = (EditTextPreference) findPreference("KEY_BIKE_ID");
         EditTextPreference editTextPreference_NEAREST_BIKE_ID = (EditTextPreference) findPreference("KEY_NEAREST_BIKE_ID");
+        EditTextPreference editTextPreference_SIGN_ID = (EditTextPreference) findPreference("KEY_BIKE_SIGN");
+        EditTextPreference editTextPreference_USER_ID = (EditTextPreference) findPreference("KEY_BIKE_USER_ID");
+
+        String scope = editTextPreference_SCOPE.getText();
+        if("0".equals(String.valueOf(scope))) {
+            editTextPreference_SCOPE.setSummary("N/A");
+        } else {
+            editTextPreference_SCOPE.setSummary(scope);
+        }
 
         String LONGITUDE = editTextPreference_LONGITUDE.getText();
         if("0".equals(String.valueOf(LONGITUDE))) {
@@ -50,18 +64,67 @@ public class MobikePreferenceFragment extends PreferenceFragment {
         } else {
             editTextPreference_NEAREST_BIKE_ID.setSummary(NEAREST_BIKE_ID);
         }
+
+        String SIGN_ID = editTextPreference_SIGN_ID.getText();
+        if("0".equals(String.valueOf(SIGN_ID))) {
+            editTextPreference_SIGN_ID.setSummary("N/A");
+        } else {
+            editTextPreference_SIGN_ID.setSummary(SIGN_ID);
+        }
+
+        String USER_ID = editTextPreference_USER_ID.getText();
+        if("0".equals(String.valueOf(USER_ID))) {
+            editTextPreference_USER_ID.setSummary("N/A");
+        } else {
+            editTextPreference_USER_ID.setSummary(USER_ID);
+        }
+
     }
 
     @Override
-    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
-                                         Preference preference) {
-        EditTextPreference editTextPreference_LONGITUDE = (EditTextPreference) findPreference("KEY_BIKE_LONGITUDE");
-        EditTextPreference editTextPreference_LATITUDE = (EditTextPreference) findPreference("KEY_BIKE_LATITUDE");
+    public void onResume() {
+        super.onResume();
+        getPreferenceScreen().getSharedPreferences()
+                .registerOnSharedPreferenceChangeListener(this);
+    }
 
-        switch(preference.getKey()){
+    @Override
+    public void onPause() {
+        super.onPause();
+        getPreferenceScreen().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        switch(key){
+            case "KEY_BIKE_SCOPE":
+            case "KEY_BIKE_LONGITUDE":
+            case "KEY_BIKE_LATITUDE":
+            case "KEY_BIKE_SIGN":
+            case "KEY_BIKE_USER_ID":
+            {
+                Preference connectionPref = findPreference(key);
+                // Set summary to be the user-description for the selected value
+                connectionPref.setSummary(sharedPreferences.getString(key, ""));
+                break;
+            }
+
+            case "KEY_BIKE_TYPE":
+                {
+               // Preference connectionPref = findPreference(key);
+                ListPreference listPreference = (ListPreference) findPreference(key);
+                listPreference.setSummary(listPreference.getEntry());
+                break;
+            }
+
+
 
             case "KEY_BIKE_USE_GPS": {
-                boolean checked = ((SwitchPreference) preference).isChecked();
+                Preference connectionPref = findPreference(key);
+                EditTextPreference editTextPreference_LONGITUDE = (EditTextPreference) findPreference("KEY_BIKE_LONGITUDE");
+                EditTextPreference editTextPreference_LATITUDE = (EditTextPreference) findPreference("KEY_BIKE_LATITUDE");
+
+                boolean checked = ((SwitchPreference) connectionPref).isChecked();
                 if(checked ) {
                     editTextPreference_LONGITUDE.setEnabled(false);
                     editTextPreference_LATITUDE.setEnabled(false);
@@ -71,30 +134,6 @@ public class MobikePreferenceFragment extends PreferenceFragment {
                 }
                 break;
             }
-
-            case "KEY_BIKE_SIGN": {
-                EditTextPreference signCodeEditTextPre = (EditTextPreference) findPreference("KEY_BIKE_SIGN");
-                String newValue = signCodeEditTextPre.getText();
-                if("0".equals(String.valueOf(newValue))) {
-                    preference.setSummary("");
-                } else {
-                    preference.setSummary(newValue);
-                }
-                break;
-            }
-            case "KEY_BIKE_USER_ID": {
-                EditTextPreference user_idEditTextPre = (EditTextPreference) findPreference("KEY_BIKE_USER_ID");
-                String newValue = user_idEditTextPre.getText();
-                if("0".equals(String.valueOf(newValue))) {
-                    preference.setSummary("");
-                } else {
-                    preference.setSummary(newValue);
-                }
-                break;
-            }
         }
-        // TODO Auto-generated method stub
-        return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
-
 }

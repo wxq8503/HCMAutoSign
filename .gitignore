@@ -5,5 +5,7 @@
 /.idea/libraries
 .DS_Store
 /build
+/app/release
 /captures
 .externalNativeBuild
+app/libs/BaiduLBS_Android.jar

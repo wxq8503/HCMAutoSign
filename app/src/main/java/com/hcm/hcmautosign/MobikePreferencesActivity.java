@@ -6,12 +6,14 @@ package com.hcm.hcmautosign;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 
 public class MobikePreferencesActivity extends PreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PreferenceManager.setDefaultValues(this, R.xml.mobike_settings, false);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MobikePreferenceFragment()).commit();
     }
 }

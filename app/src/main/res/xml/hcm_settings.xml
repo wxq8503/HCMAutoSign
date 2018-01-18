@@ -16,6 +16,26 @@
             android:dialogTitle="Input Authorization Code"
             android:hint="Authorization Code"
             android:summary="Authorization Code"/>
+
+        <EditTextPreference
+            android:title="经度"
+            android:defaultValue="121.622440"
+            android:key="KEY_PUNCHIN_LONGITUDE"
+            android:selectAllOnFocus="true"
+            android:inputType="text|numberDecimal"
+            android:dialogTitle="Input经度"
+            android:hint="经度"
+            android:summary="%s"/>
+
+        <EditTextPreference
+            android:title="纬度"
+            android:defaultValue="31.260866"
+            android:key="KEY_PUNCHIN_LATITUDE"
+            android:selectAllOnFocus="true"
+            android:inputType="text|numberDecimal"
+            android:dialogTitle="Input纬度"
+            android:hint="纬度"
+            android:summary="$s"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

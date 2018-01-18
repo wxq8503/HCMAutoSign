@@ -1,11 +1,13 @@
 package com.hcm.hcmautosign;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.widget.Switch;
@@ -14,57 +16,67 @@ import android.widget.Switch;
  * Created by weia on 2018/1/10.
  */
 
-public class HCMPreferenceFragment extends PreferenceFragment {
-
+public class HCMPreferenceFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.hcm_settings);
+        EditTextPreference editTextPreference_AUTH_CODE = (EditTextPreference) findPreference("KEY_AUTH_CODE");
+        EditTextPreference editTextPreference_LONGITUDE = (EditTextPreference) findPreference("KEY_PUNCHIN_LONGITUDE");
+        EditTextPreference editTextPreference_LATITUDE = (EditTextPreference) findPreference("KEY_PUNCHIN_LATITUDE");
 
-        EditTextPreference authCodeEditTextPre = (EditTextPreference) findPreference("KEY_AUTH_CODE");
-        /*
-        authCodeEditTextPre.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                if("0".equals(String.valueOf(newValue))) {
-                    preference.setSummary("");
-                } else {
-                    preference.setSummary(newValue + "------Click to change");
-                }
-                return true;
-            }
-        });
-*/
-        String auth_code = authCodeEditTextPre.getText();
-        if("0".equals(String.valueOf(auth_code))) {
-            authCodeEditTextPre.setSummary("");
+        String scope = editTextPreference_AUTH_CODE.getText();
+        if("0".equals(String.valueOf(scope))) {
+            editTextPreference_AUTH_CODE.setSummary("N/A");
         } else {
-            authCodeEditTextPre.setSummary(auth_code + "-----Click to change");
+            editTextPreference_AUTH_CODE.setSummary(scope);
         }
+
+        String LONGITUDE = editTextPreference_LONGITUDE.getText();
+        if("0".equals(String.valueOf(LONGITUDE))) {
+            editTextPreference_LONGITUDE.setSummary("N/A");
+        } else {
+            editTextPreference_LONGITUDE.setSummary(LONGITUDE);
+        }
+
+        String LATITUDE = editTextPreference_LATITUDE.getText();
+        if("0".equals(String.valueOf(LONGITUDE))) {
+            editTextPreference_LATITUDE.setSummary("N/A");
+        } else {
+            editTextPreference_LATITUDE.setSummary(LATITUDE);
+        }
+
     }
 
     @Override
-    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
-                                         Preference preference) {
+    public void onResume() {
+        super.onResume();
+        getPreferenceScreen().getSharedPreferences()
+                .registerOnSharedPreferenceChangeListener(this);
 
-        switch(preference.getKey()){
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getPreferenceScreen().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        switch(key){
             case "KEY_ENABLE_HCM": {
                 break;
             }
+            case "KEY_PUNCHIN_LONGITUDE":
+            case "KEY_PUNCHIN_LATITUDE":
             case "KEY_AUTH_CODE": {
-                EditTextPreference authCodeEditTextPre = (EditTextPreference) findPreference("KEY_AUTH_CODE");
-                String newValue = authCodeEditTextPre.getText();
-                if("0".equals(String.valueOf(newValue))) {
-                    preference.setSummary("");
-                } else {
-                    preference.setSummary(newValue + "------Click to change");
-                }
+                Preference connectionPref = findPreference(key);
+                // Set summary to be the user-description for the selected value
+                connectionPref.setSummary(sharedPreferences.getString(key, ""));
                 break;
             }
         }
-        // TODO Auto-generated method stub
-        return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
-
 }
