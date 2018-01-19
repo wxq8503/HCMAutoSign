@@ -46,6 +46,15 @@
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
             android:summary="$s"/>
+
+        <com.hcm.hcmautosign.TimePreference
+            android:key="timePrefA_Key"
+            android:title="Clock In Time"/>
+
+        <com.hcm.hcmautosign.TimePreference
+            android:key="timePrefB_Key"
+            android:title="Clock Out Time"/>
+
     </PreferenceCategory>
 
 </PreferenceScreen>
