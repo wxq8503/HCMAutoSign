@@ -1,16 +1,11 @@
 package com.hcm.hcmautosign;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
-import android.preference.SwitchPreference;
-import android.widget.Switch;
 
 /**
  * Created by weia on 2018/1/10.
@@ -21,7 +16,7 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.hcm_settings);
+        addPreferencesFromResource(R.xml.pref_setting_hcm);
         EditTextPreference editTextPreference_AUTH_CODE = (EditTextPreference) findPreference("KEY_AUTH_CODE");
         EditTextPreference editTextPreference_LONGITUDE = (EditTextPreference) findPreference("KEY_PUNCHIN_LONGITUDE");
         EditTextPreference editTextPreference_LATITUDE = (EditTextPreference) findPreference("KEY_PUNCHIN_LATITUDE");
@@ -75,6 +70,13 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
                 Preference connectionPref = findPreference(key);
                 // Set summary to be the user-description for the selected value
                 connectionPref.setSummary(sharedPreferences.getString(key, ""));
+                break;
+            }
+            case "KEY_HCM_LOCATION_LIST":
+            {
+                // Preference connectionPref = findPreference(key);
+                ListPreference listPreference = (ListPreference) findPreference(key);
+                listPreference.setSummary(listPreference.getEntry());
                 break;
             }
         }

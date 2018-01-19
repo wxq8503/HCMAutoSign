@@ -13,19 +13,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".HCMActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".HCMPreferencesActivity" />
-        <activity android:name=".MobikePreferencesActivity" />
+        <activity android:label="HCMPreference" android:name=".HCMPreferencesActivity" />
+        <activity android:label="MoBikePreference" android:name=".MobikePreferencesActivity" />
+        <activity android:label="MoBike" android:name=".MobikeActivity"></activity>
 
         <service android:name=".HCMAutoSignService"></service>
-
-        <activity android:label="MoBike" android:name=".MobikeActivity"></activity>
 
     </application>
 

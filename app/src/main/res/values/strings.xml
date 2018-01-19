@@ -2,7 +2,7 @@
     <string name="app_name">HCMAutoSign</string>
     <string name="title_sign">绑定</string>
     <string name="hcm_setting">Auth Code Setting</string>
-    <string name="title_home">GeoCheck</string>
+    <string name="title_home">位置检查</string>
     <string name="title_dashboard">点我打卡</string>
     <string name="title_notifications">今日打卡记录</string>
     <string name="title_activity_settings">Settings</string>
@@ -90,5 +90,22 @@
         <item>0</item>
         <item>1</item>
         <item>2</item>
+    </string-array>
+
+    <string-array name="pref_hcm_user_titles">
+        <item>A.W</item>
+        <item>J.Z</item>
+    </string-array>
+    <string-array name="pref_hcm_user_values">
+        <item>c4be3db57de41f516fd41ad9af83b3b3db362756</item>
+        <item>c4be3db57de41f516fd41ad9af83b3b3db362756</item>
+    </string-array>
+
+    <string name="pref_title_hcm_location">Location</string>
+    <string-array name="pref_hcm_location_titles">
+        <item>SDC</item>
+    </string-array>
+    <string-array name="pref_hcm_location_values">
+        <item>121.62244|31.260866</item>
     </string-array>
 </resources>

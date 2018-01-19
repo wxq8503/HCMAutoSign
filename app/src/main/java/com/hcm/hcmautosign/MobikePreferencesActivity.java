@@ -13,7 +13,7 @@ public class MobikePreferencesActivity extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        PreferenceManager.setDefaultValues(this, R.xml.mobike_settings, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref__setting_mobike, false);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MobikePreferenceFragment()).commit();
     }
 }

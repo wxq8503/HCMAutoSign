@@ -5,13 +5,11 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -22,23 +20,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -46,73 +34,83 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity{
+public class HCMActivity extends AppCompatActivity implements View.OnClickListener{
 
     private TextView mTextMessage;
+    private Button btnPunchin;
+    private Button btnHCMSetting;
+    private Button btnGeoCheck;
+    private Button btnSignRecords;
     private String action;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
-    private String TAG = MainActivity.class.getSimpleName();
+    private String TAG = HCMActivity.class.getSimpleName();
     ArrayList<HashMap<String, String>> resultList;
     private ListView lv;
-
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            //preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
-            String longitude;
-            longitude = preferences.getString("KEY_PUNCHIN_LONGITUDE", "121.622440");
-            String latitude;
-            latitude = preferences.getString("KEY_PUNCHIN_LATITUDE", "31.260886");
-
-            if("N/A".equals(authorization)){
-                Toast.makeText(getApplicationContext(),
-                        "Can not find the authrization code,\n Please update the code first!",
-                        Toast.LENGTH_LONG).show();
-                return false;
-            }
-
-            resultList = new ArrayList<>();
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    mTextMessage.setText("检查打卡点");
-                    action = "GeoCheck";
-                    new JSONTask().execute(action, authorization, longitude, latitude);
-                    return true;
-                case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
-                    action = "Punchin";
-                    new JSONTask().execute(action, authorization, longitude, latitude);
-                    //return HCM_Punchin_OKHttp();
-                    return true;
-                case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
-                    action = "PunCheck";
-                    new JSONTask().execute(action, authorization, longitude, latitude);
-                    return true;
-            }
-            return false;
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_hcm);
 
-        mTextMessage = findViewById(R.id.message);
+        btnPunchin = findViewById(R.id.btnPunchin);
+        btnGeoCheck= findViewById(R.id.btnGeoCheck);
+        btnSignRecords= findViewById(R.id.btnSignRecords);
+        btnHCMSetting = findViewById(R.id.btnHCMSetting);
+
+        btnPunchin.setOnClickListener(this);
+        btnGeoCheck.setOnClickListener(this);
+        btnSignRecords.setOnClickListener(this);
+        btnHCMSetting.setOnClickListener(this);
+
+        mTextMessage = findViewById(R.id.txtStatus);
         preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
         mTextMessage.setText(authorization);
-
         lv = findViewById(R.id.hcm_list);
-
-        BottomNavigationView navigation = findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
+
+    @Override
+    public void onClick(View v) {
+        // handle click
+        preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        editor = preferences.edit();
+
+        String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
+        String longitude;
+        longitude = preferences.getString("KEY_PUNCHIN_LONGITUDE", "121.622440");
+        String latitude;
+        latitude = preferences.getString("KEY_PUNCHIN_LATITUDE", "31.260886");
+
+        if("N/A".equals(authorization)){
+            Toast.makeText(getApplicationContext(),
+                    "Can not find the authrization code,\n Please update the code first!",
+                    Toast.LENGTH_LONG).show();
+        }
+
+        resultList = new ArrayList<>();
+        switch (v.getId()) {
+            case R.id.btnGeoCheck:
+                mTextMessage.setText("检查打卡点");
+                action = "GeoCheck";
+                new JSONTask().execute(action, authorization, longitude, latitude);
+                break;
+            case R.id.btnPunchin:
+                mTextMessage.setText(R.string.title_dashboard);
+                action = "Punchin";
+                new JSONTask().execute(action, authorization, longitude, latitude);
+                break;
+            case R.id.btnSignRecords:
+                mTextMessage.setText(R.string.title_notifications);
+                action = "PunCheck";
+                new JSONTask().execute(action, authorization, longitude, latitude);
+                break;
+            case R.id.btnHCMSetting:
+                getHCMSettingsFragment(v);
+                break;
+        }
+    }
+
 
     public void getHCMSettingsFragment(View view) {
         Intent launchIntent = new Intent(this, HCMPreferencesActivity.class);
@@ -167,170 +165,6 @@ public class MainActivity extends AppCompatActivity{
                 punch_item.put("note", e.getMessage());
                 resultList.add(punch_item);
                 return e.getMessage();
-            }
-            return null;
-        }
-
-        public String HCM_PunCheck(String authorization) {
-            BufferedReader reader;
-            OutputStream os = null;
-            InputStream is = null;
-            String url_str = "https://open.hcmcloud.cn/api/attend.view.employee.day";
-            String name = "hcm cloud";
-            String employee_id = "";
-            String date = "";
-            Long tsLong = System.currentTimeMillis();
-            String timestamp = tsLong.toString();
-
-            //timestamp ="1513039572365";
-            List<String> hash_text_list = new ArrayList<>();
-            hash_text_list.add(timestamp);
-            hash_text_list.add(name);
-            String hash_text_joined = TextUtils.join("", hash_text_list);
-            String hash_text = md5(hash_text_joined);
-            Log.i("-----send timestamp", timestamp);
-            Log.i("-----send Hash text", hash_text_joined);
-            Log.i("-----send Hashed", hash_text);
-            HttpURLConnection connection = null;
-            try {
-                JSONObject ClientKey = new JSONObject();
-                ClientKey.put("employee_id", employee_id);
-                ClientKey.put("date", date);
-                String content = String.valueOf(ClientKey);
-                Log.i("-----send content", content);
-                URL url = new URL(url_str);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setConnectTimeout(10000);
-                connection.setDoOutput(true);
-                connection.setRequestMethod("POST");
-
-                connection.setRequestProperty("Charset", "UTF-8");
-                //connection.setRequestProperty("accept-encoding", "gzip");
-                connection.setRequestProperty("referer", "https://servicewechat.com/wx3b6d85db7f8fb428/4/page-frame.html");
-                connection.setRequestProperty("authorization", authorization);
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("user-Agent", user_agent);
-                connection.setRequestProperty("Connection", "Keep-Alive");
-                connection.setRequestProperty("host", "open.hcmcloud.cn");
-                //connection.setRequestProperty("content-length", "129");
-                connection.setRequestProperty("cache-control", "no-cache");
-
-                os = connection.getOutputStream();
-                os.write(content.getBytes());
-                os.flush();
-                os.close();
-                // 定义BufferedReader输入流来读取URL的响应
-                Log.i("-----send", "end");
-                int code = connection.getResponseCode();
-                if (code == 200) {
-                    InputStream stream = connection.getInputStream();
-                    reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
-
-                    StringBuffer buffer = new StringBuffer();
-                    String line ;
-                    while ((line = reader.readLine())!= null){
-                        buffer.append(line);
-                    }
-                    String result_utf8 = buffer.toString();
-                    Log.i("-----send Flag", result_utf8);
-                    String return_contactor = "";
-                    try {
-                        JSONObject jsonObj = new JSONObject(result_utf8);
-                        JSONObject punchinresultObj = jsonObj.getJSONObject("result");
-                        String success_flag = punchinresultObj.getString("success");
-                        Log.e(TAG, "success_flag: " + success_flag);
-                        JSONObject punchindataObj = punchinresultObj.getJSONObject("data");
-                        Log.e(TAG, "punchindataObj: " + punchindataObj);
-                        // Getting JSON Array node
-                        JSONArray punchin = punchindataObj.getJSONArray("signin");
-                        Log.e(TAG, "punchin_flag: " + punchin);
-
-                        // looping through All Contacts
-                        for (int i = 0; i < punchin.length(); i++) {
-                            JSONObject c = punchin.getJSONObject(i);
-                            String source = c.getString("source");
-                            String time = c.getString("time");
-                            return_contactor = return_contactor + source + "|" + time + "|";
-                            // tmp hash map for single contact
-                            HashMap<String, String> punch_item = new HashMap<>();
-
-                            // adding each child node to HashMap key => value
-                            punch_item.put("item", String.valueOf(i + 1));
-                            punch_item.put("note", source + " | " + time);
-
-                            resultList.add(punch_item);
-                        }
-                    } catch (final JSONException e) {
-                        Log.e(TAG, "Json parsing error: " + e.getMessage());
-                        HashMap<String, String> punch_item = new HashMap<>();
-                        punch_item.put("item", "Json parsing error");
-                        punch_item.put("note", e.getMessage());
-                        resultList.add(punch_item);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getApplicationContext(),
-                                        "Json parsing error: " + e.getMessage(),
-                                        Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                    return  return_contactor;
-
-                } else {
-                    Log.i("-----send Code", Integer.toString(code));
-                    Log.i("-----send Flag", "数据提交失败");
-                    return "数据提交失败:" + Integer.toString(code);
-                    /*
-                    InputStream stream = connection.getInputStream();
-                    reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
-
-                    StringBuffer buffer = new StringBuffer();
-                    String line ;
-                    while ((line = reader.readLine())!= null){
-                        buffer.append(line);
-                    }
-                    Log.i("-----send Flag", buffer.toString());
-                    return  buffer.toString();
-                    */
-                }
-            } catch (SocketTimeoutException e) {
-                Log.i("-----send Error", "连接时间超时");
-                e.printStackTrace();
-                return "连接时间超时";
-
-            } catch (MalformedURLException e) {
-                Log.i("-----send Error", "Malformed");
-                e.printStackTrace();
-
-            } catch (ProtocolException e) {
-                Log.i("-----send Error", "Protocol");
-                e.printStackTrace();
-
-            } catch (IOException e) {
-                Log.i("-----send Error", "IO");
-                e.printStackTrace();
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.i("-----send Error", "JSON");
-            } catch (Exception e) {
-                Log.i("-----send Error", "Other" + e.toString());
-                e.printStackTrace();
-            } finally {// 使用finally块来关闭输出流、输入流
-                try {
-                    if (connection!= null) {
-                        connection.disconnect();
-                    }
-                    if (os != null) {
-                        os.close();
-                    }
-                    if (is != null) {
-                        is.close();
-                    }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
             }
             return null;
         }
@@ -396,19 +230,26 @@ public class MainActivity extends AppCompatActivity{
                     JSONArray punchin = punchindataObj.getJSONArray("signin");
                     Log.e(TAG, "punchin_flag: " + punchin);
 
-                    // looping through All Contacts
-                    for (int i = 0; i < punchin.length(); i++) {
-                        JSONObject c = punchin.getJSONObject(i);
-                        String source = c.getString("source");
-                        String time = c.getString("time");
-                        return_contactor = return_contactor + source + "|" + time + "|";
+                    if(punchin.length()>0){
+                        // looping through All punchin
+                        for (int i = 0; i < punchin.length(); i++) {
+                            JSONObject c = punchin.getJSONObject(i);
+                            String source = c.getString("source");
+                            String time = c.getString("time");
+                            return_contactor = return_contactor + source + "|" + time + "|";
+                            // tmp hash map for single contact
+                            HashMap<String, String> punch_item = new HashMap<>();
+                            // adding each child node to HashMap key => value
+                            punch_item.put("item", String.valueOf(i + 1));
+                            punch_item.put("note", source + " | " + time);
+                            resultList.add(punch_item);
+                        }
+                    }else{
                         // tmp hash map for single contact
                         HashMap<String, String> punch_item = new HashMap<>();
-
                         // adding each child node to HashMap key => value
-                        punch_item.put("item", String.valueOf(i + 1));
-                        punch_item.put("note", source + " | " + time);
-
+                        punch_item.put("item", "Please clock in first");
+                        punch_item.put("note", "No record be found!");
                         resultList.add(punch_item);
                     }
                 } catch (final JSONException e) {
@@ -770,7 +611,7 @@ public class MainActivity extends AppCompatActivity{
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             //mTextMessage.setText(result);
-            ListAdapter adapter = new SimpleAdapter(MainActivity.this, resultList, R.layout.hcm_list_item, new String[]{ "item","note"}, new int[]{R.id.item, R.id.note});
+            ListAdapter adapter = new SimpleAdapter(HCMActivity.this, resultList, R.layout.hcm_list_item, new String[]{ "item","note"}, new int[]{R.id.item, R.id.note});
             lv.setAdapter(adapter);
         }
     }

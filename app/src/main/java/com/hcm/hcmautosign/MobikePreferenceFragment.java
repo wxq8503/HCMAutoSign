@@ -7,7 +7,6 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 
 /**
@@ -19,8 +18,8 @@ public class MobikePreferenceFragment extends PreferenceFragment implements Shar
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.mobike_settings);
-        PreferenceManager.setDefaultValues(getContext(), R.xml.mobike_settings, false);
+        addPreferencesFromResource(R.xml.pref__setting_mobike);
+        PreferenceManager.setDefaultValues(getContext(), R.xml.pref__setting_mobike, false);
 
         EditTextPreference editTextPreference_SCOPE = (EditTextPreference) findPreference("KEY_BIKE_SCOPE");
         EditTextPreference editTextPreference_LONGITUDE = (EditTextPreference) findPreference("KEY_BIKE_LONGITUDE");
