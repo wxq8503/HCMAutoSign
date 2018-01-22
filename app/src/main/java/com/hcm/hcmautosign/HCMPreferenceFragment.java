@@ -1,11 +1,13 @@
 package com.hcm.hcmautosign;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 
 /**
  * Created by weia on 2018/1/10.
@@ -62,6 +64,19 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         switch(key){
             case "KEY_ENABLE_HCM": {
+                Preference connectionPref = findPreference(key);
+                TimePreference clock_in = (TimePreference) findPreference("timePrefClockIn_Key");
+                TimePreference clock_out = (TimePreference) findPreference("timePrefClockOut_Key");
+                boolean checked = ((SwitchPreference) connectionPref).isChecked();
+                if(checked) {
+                    clock_in.setEnabled(true);
+                    clock_out.setEnabled(true);
+                    getActivity().startService(new Intent(getActivity(), HCMAutoSignService.class));
+                }else{
+                    getActivity().stopService(new Intent(getActivity(), HCMAutoSignService.class));
+                    clock_in.setEnabled(false);
+                    clock_out.setEnabled(false);
+                }
                 break;
             }
             case "KEY_PUNCHIN_LONGITUDE":

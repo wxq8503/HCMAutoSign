@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="HCM Setting">
-        <SwitchPreference
-            android:defaultValue="true"
-            android:title="HCM"
-            android:icon="@drawable/settings_ic_hcm"
-            android:key="KEY_ENABLE_HCM" />
-
+    <PreferenceCategory android:title="HCM Basic Setting">
         <EditTextPreference
             android:title="Authorization Code"
             android:defaultValue="c4be3db57de41f516fd41ad9af83b3b3db362756"
@@ -46,15 +40,22 @@
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
             android:summary="$s"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="HCM Auto Clock In/Out">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:title="HCM"
+            android:icon="@drawable/settings_ic_hcm"
+            android:key="KEY_ENABLE_HCM" />
 
         <com.hcm.hcmautosign.TimePreference
-            android:key="timePrefA_Key"
+            android:key="timePrefClockIn_Key"
             android:title="Clock In Time"/>
 
         <com.hcm.hcmautosign.TimePreference
-            android:key="timePrefB_Key"
+            android:key="timePrefClockOut_Key"
             android:title="Clock Out Time"/>
 
     </PreferenceCategory>
-
 </PreferenceScreen>

@@ -7,11 +7,13 @@ package com.hcm.hcmautosign;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.preference.DialogPreference;
+import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TimePicker;
 
 import java.util.Calendar;
+import java.util.Date;
 
 public class TimePreference extends DialogPreference {
     private int lastHour=0;
@@ -34,6 +36,7 @@ public class TimePreference extends DialogPreference {
     public TimePreference(Context ctxt) {
         this(ctxt, null);
     }
+
     public TimePreference(Context ctxt, AttributeSet attrs) {
         super(ctxt, attrs);
 
@@ -69,6 +72,7 @@ public class TimePreference extends DialogPreference {
             if (callChangeListener(time)) {
                 persistString(time);
             }
+            setSummary(getSummary());
         }
     }
 
@@ -95,5 +99,12 @@ public class TimePreference extends DialogPreference {
 
         lastHour=getHour(time);
         lastMinute=getMinute(time);
+    }
+
+    @Override
+    public CharSequence getSummary() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, Calendar.MONTH, Calendar.DAY_OF_MONTH, lastHour, lastMinute);
+        return DateFormat.getTimeFormat(getContext()).format(new Date(cal.getTimeInMillis()));
     }
 }

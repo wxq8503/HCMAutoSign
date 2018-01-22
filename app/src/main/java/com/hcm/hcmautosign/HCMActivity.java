@@ -253,19 +253,37 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                         resultList.add(punch_item);
                     }
                 } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    HashMap<String, String> punch_item = new HashMap<>();
-                    punch_item.put("item", "Json parsing error");
-                    punch_item.put("note", e.getMessage());
-                    resultList.add(punch_item);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    try{
+                        JSONObject jsonObj = new JSONObject(result);
+                        final String errmsg = jsonObj.getString("errmsg");
+                        Log.e(TAG, "Error message: " + errmsg);
+                        HashMap<String, String> punch_item = new HashMap<>();
+                        punch_item.put("item", "Error Message");
+                        punch_item.put("note", errmsg);
+                        resultList.add(punch_item);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(),
+                                        "Error Message: " + errmsg,
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }catch ( final JSONException ex) {
+                        Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
+                        HashMap<String, String> punch_item = new HashMap<>();
+                        punch_item.put("item", "Json parsing error_1");
+                        punch_item.put("note", ex.getMessage());
+                        resultList.add(punch_item);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(),
+                                        "Json parsing error 1: " + ex.getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
                 }
                 return  return_contactor;
             } catch (IOException e) {
@@ -369,19 +387,37 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                     }
 
                 } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    HashMap<String, String> punch_item = new HashMap<>();
-                    punch_item.put("item", "Json parsing error");
-                    punch_item.put("note", e.getMessage());
-                    resultList.add(punch_item);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    try{
+                        JSONObject jsonObj = new JSONObject(result);
+                        final String errmsg = jsonObj.getString("errmsg");
+                        Log.e(TAG, "Error message: " + errmsg);
+                        HashMap<String, String> punch_item = new HashMap<>();
+                        punch_item.put("item", "Error Message");
+                        punch_item.put("note", errmsg);
+                        resultList.add(punch_item);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(),
+                                        "Error Message: " + errmsg,
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }catch ( final JSONException ex) {
+                        Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
+                        HashMap<String, String> punch_item = new HashMap<>();
+                        punch_item.put("item", "Json parsing error_1");
+                        punch_item.put("note", ex.getMessage());
+                        resultList.add(punch_item);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(),
+                                        "Json parsing error 1: " + ex.getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
                 }
                 return return_contact;
             } catch (IOException e) {
@@ -484,20 +520,37 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
 
                     return_contact = check_flag + "|打卡地点:" + address + "|排名:"+ index + "|今日打卡次数:" + count + "|签到时间:" + firsttime + "|本次打卡时间:" + time;
                 } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    HashMap<String, String> punch_item = new HashMap<>();
-                    punch_item.put("item", "Json parsing error");
-                    punch_item.put("note", e.getMessage());
-                    resultList.add(punch_item);
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    try{
+                        JSONObject jsonObj = new JSONObject(result);
+                        final String errmsg = jsonObj.getString("errmsg");
+                        Log.e(TAG, "Error message: " + errmsg);
+                        HashMap<String, String> punch_item = new HashMap<>();
+                        punch_item.put("item", "Error Message");
+                        punch_item.put("note", errmsg);
+                        resultList.add(punch_item);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(),
+                                        "Error Message: " + errmsg,
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }catch ( final JSONException ex) {
+                        Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
+                        HashMap<String, String> punch_item = new HashMap<>();
+                        punch_item.put("item", "Json parsing error_1");
+                        punch_item.put("note", ex.getMessage());
+                        resultList.add(punch_item);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(),
+                                        "Json parsing error 1: " + ex.getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
                 }
                 return return_contact;
             } catch (IOException e) {

@@ -42,7 +42,7 @@ public class MobikeActivity extends AppCompatActivity implements View.OnClickLis
     private String action;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
-    private String TAG = MainActivity.class.getSimpleName();
+    private String TAG = this.getClass().getSimpleName();
     ArrayList<HashMap<String, String>> contactList;
     private ListView lv;
 
