@@ -1,10 +1,16 @@
 package com.hcm.hcmautosign;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -68,12 +74,39 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
         mTextMessage.setText(authorization);
         lv = findViewById(R.id.hcm_list);
+
+        registerReceiver(broadcastReceiver, new IntentFilter("GEO_CHECK"));
+    }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // internet lost alert dialog method call from here
+            String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
+            String longitude;
+            longitude = preferences.getString("KEY_PUNCHIN_LONGITUDE", "121.622440");
+            String latitude;
+            latitude = preferences.getString("KEY_PUNCHIN_LATITUDE", "31.260886");
+
+
+            action = preferences.getString("KEY_HCM_FUNCTION_LIST", "GeoCheck");
+            //action = "GeoCheck";
+            Log.i("-----send clock in cmd", action);
+            new JSONTask().execute(action, authorization, longitude, latitude);
+        }
+
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(broadcastReceiver);
     }
 
     @Override
     public void onClick(View v) {
         // handle click
-        preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        //preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         editor = preferences.edit();
 
         String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
@@ -81,6 +114,13 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         longitude = preferences.getString("KEY_PUNCHIN_LONGITUDE", "121.622440");
         String latitude;
         latitude = preferences.getString("KEY_PUNCHIN_LATITUDE", "31.260886");
+        String clock_in;
+        clock_in = preferences.getString("timePrefClockIn_Key", "N/A");
+        String clock_out;
+        clock_out = preferences.getString("timePrefClockOut_Key", "N/A");
+
+        Log.i("-----send time clock in", clock_in);
+        Log.i("-----send time clockout", clock_out);
 
         if("N/A".equals(authorization)){
             Toast.makeText(getApplicationContext(),
@@ -142,7 +182,6 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                 String longitude = params[2].trim();
                 String latitude = params[3].trim();
 
-
                 if(params[0].equals("GeoCheck" )) {
                     Log.i("-----send action", "GeoCheck");
                     return HCM_GeoCheck_OKHttp(authorization, longitude, latitude);
@@ -167,6 +206,24 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                 return e.getMessage();
             }
             return null;
+        }
+
+        private void addNotification(String showText) {
+            NotificationCompat.Builder builder =
+                    new NotificationCompat.Builder(getApplicationContext(), "Channel ID")
+                            .setSmallIcon(R.drawable.settings_ic_hcm)
+                            .setContentTitle("HCM 打卡")
+                            .setContentText(showText)
+                            .setContentInfo("Info");
+
+            Intent notificationIntent = new Intent(getApplicationContext(), HCMActivity.class);
+            PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            builder.setContentIntent(contentIntent);
+
+            // Add as notification
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.notify(0, builder.build());
         }
 
         public String HCM_PunCheck_OKHttp(String authorization){
@@ -252,8 +309,10 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                         punch_item.put("note", "No record be found!");
                         resultList.add(punch_item);
                     }
+                    addNotification("打卡记录检查完成！");
                 } catch (final JSONException e) {
                     try{
+                        addNotification("打卡记录检查失败，请检查设置");
                         JSONObject jsonObj = new JSONObject(result);
                         final String errmsg = jsonObj.getString("errmsg");
                         Log.e(TAG, "Error message: " + errmsg);
@@ -385,9 +444,10 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                         resultList.add(punch_item);
                         return_contact = check_flag + "|打卡地点:" + address + "| 距离目标:"+ distance + "米";
                     }
-
+                    addNotification("位置检查完成");
                 } catch (final JSONException e) {
                     try{
+                        addNotification("检查到错误");
                         JSONObject jsonObj = new JSONObject(result);
                         final String errmsg = jsonObj.getString("errmsg");
                         Log.e(TAG, "Error message: " + errmsg);
@@ -519,8 +579,10 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                     resultList.add(punch_item4);
 
                     return_contact = check_flag + "|打卡地点:" + address + "|排名:"+ index + "|今日打卡次数:" + count + "|签到时间:" + firsttime + "|本次打卡时间:" + time;
+                    addNotification("成功打卡");
                 } catch (final JSONException e) {
                     try{
+                        addNotification("打卡失败，请检查设置");
                         JSONObject jsonObj = new JSONObject(result);
                         final String errmsg = jsonObj.getString("errmsg");
                         Log.e(TAG, "Error message: " + errmsg);

@@ -27,7 +27,7 @@
         <activity android:label="MoBike" android:name=".MobikeActivity"></activity>
 
         <service android:name=".HCMAutoSignService"></service>
-        <receiver android:process=":remote" android:name=".Alarm"></receiver>
+        <receiver android:name=".Alarm"></receiver>
     </application>
 
 </manifest>

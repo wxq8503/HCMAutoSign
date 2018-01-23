@@ -108,4 +108,17 @@
     <string-array name="pref_hcm_location_values">
         <item>121.62244|31.260866</item>
     </string-array>
+
+    <string name="pref_title_hcm_function">Function</string>
+    <string-array name="pref_hcm_function_titles">
+        <item>Geo Check</item>
+        <item>Punch Check</item>
+        <item>Clocl In/Out</item>
+    </string-array>
+    <string-array name="pref_hcm_function_values">
+        <item>GeoCheck</item>
+        <item>PunCheck</item>
+        <item>Punchin</item>
+    </string-array>
+
 </resources>

@@ -34,7 +34,7 @@
             android:inputType="text|numberDecimal"
             android:dialogTitle="Input纬度"
             android:hint="纬度"
-            android:summary="$s"/>
+            android:summary="%s"/>
         <EditTextPreference
             android:title="Reserved Bike ID"
             android:defaultValue="N/A"

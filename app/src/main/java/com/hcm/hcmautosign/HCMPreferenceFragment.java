@@ -8,6 +8,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
+import android.util.Log;
 
 /**
  * Created by weia on 2018/1/10.
@@ -92,6 +93,12 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
                 // Preference connectionPref = findPreference(key);
                 ListPreference listPreference = (ListPreference) findPreference(key);
                 listPreference.setSummary(listPreference.getEntry());
+                break;
+            }
+            case "timePrefClockIn_Key":
+            case "timePrefClockOut_Key": {
+                Log.i("-----Preference Change","Hello");
+                getActivity().startService(new Intent(getActivity(), HCMAutoSignService.class));
                 break;
             }
         }

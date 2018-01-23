@@ -29,7 +29,7 @@
             android:inputType="text|numberDecimal"
             android:dialogTitle="Input Latitude"
             android:hint="Latitude"
-            android:summary="$s"/>
+            android:summary="%s"/>
 
         <ListPreference
             android:defaultValue="121.62244|31.260866"
@@ -39,7 +39,7 @@
             android:title="@string/pref_title_hcm_location"
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
-            android:summary="$s"/>
+            android:summary="%s"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="HCM Auto Clock In/Out">
@@ -48,6 +48,16 @@
             android:title="HCM"
             android:icon="@drawable/settings_ic_hcm"
             android:key="KEY_ENABLE_HCM" />
+
+        <ListPreference
+            android:defaultValue="GeoCheck"
+            android:entries="@array/pref_hcm_function_titles"
+            android:entryValues="@array/pref_hcm_function_values"
+            android:key="KEY_HCM_FUNCTION_LIST"
+            android:title="@string/pref_title_hcm_function"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:summary="%s"/>
 
         <com.hcm.hcmautosign.TimePreference
             android:key="timePrefClockIn_Key"
