@@ -14,7 +14,6 @@ import android.content.SharedPreferences;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -26,31 +25,13 @@ public class Alarm extends BroadcastReceiver
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
         wl.acquire();
-        /*
-        //Log.e("----Received", "Alarm");
-        String action =  intent.getAction();
-        switch (action) {
-            case "CLOCK_IN":
-                doClockInAction(context);
-                break;
-            case "CLOCK_OUT":
-                doClockOutAction(context);
-            break;
-        }
-        */
-        context.sendBroadcast(new Intent("GEO_CHECK"));
-        //Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
+        //HCMActivity outer = new HCMActivity();
+        //SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        //String action = preferences.getString("KEY_HCM_FUNCTION_LIST", "GeoCheck");
+        //Log.i("-----Receive Broadcast", action);
+        //outer.new JSONTask().execute(action);
+        context.sendBroadcast(new Intent("HCM_CLOUD"));
         wl.release();
-    }
-
-    private void doClockInAction(Context context) {
-        Log.i("-----send time clock in", "clock_in");
-        Toast.makeText(context, "Clock In !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
-    }
-
-    private void doClockOutAction(Context context) {
-        Log.i("-----send time clockout", "clock_out");
-        Toast.makeText(context, "Clock Out!!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
     }
 
     public void setAlarm(Context context)
@@ -60,9 +41,9 @@ public class Alarm extends BroadcastReceiver
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String clock_in;
-        clock_in = preferences.getString("timePrefClockIn_Key", "N/A");
+        clock_in = preferences.getString("timePrefClockIn_Key", "8:35");
         String clock_out;
-        clock_out = preferences.getString("timePrefClockOut_Key", "N/A");
+        clock_out = preferences.getString("timePrefClockOut_Key", "17:25");
 
         Log.i("-----send time clock in", clock_in);
         Log.i("-----send time clockout", clock_out);
@@ -100,14 +81,30 @@ public class Alarm extends BroadcastReceiver
         Log.i("-----Set Alarm", intent_in.getAction());
         am.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar_in.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi_in);
 
-
-
         Intent intent_out = new Intent(context, Alarm.class);
         intent_out.setAction("CLOCK_OUT");//自定义的执行定义任务的Action
         cancelAlarm(context, intent_out);
         PendingIntent pi_out = PendingIntent.getBroadcast(context, 0, intent_out, 0);
         Log.i("-----Set Alarm", intent_out.getAction());
         am.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar_out.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi_out);
+
+        boolean clock_out_b = (PendingIntent.getBroadcast(context, 0,
+                new Intent("CLOCK_OUT"),
+                PendingIntent.FLAG_NO_CREATE) != null);
+
+        if (clock_out_b)
+        {
+            Log.d("myTag", "CLOCK_OUT Alarm is already active");
+        }
+        boolean clock_in_b = (PendingIntent.getBroadcast(context, 0,
+                new Intent("CLOCK_IN"),
+                PendingIntent.FLAG_NO_CREATE) != null);
+
+        if (clock_in_b)
+        {
+            Log.d("myTag", "CLOCK_IN Alarm is already active");
+        }
+
     }
 
     public void cancelAlarm(Context context, Intent intent)
@@ -117,7 +114,9 @@ public class Alarm extends BroadcastReceiver
             Log.i("-----Cancel Alarm", intent.getAction());
             PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, 0);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            alarmManager.cancel(sender);
+            if (alarmManager != null) {
+                alarmManager.cancel(sender);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -127,7 +126,9 @@ public class Alarm extends BroadcastReceiver
         try {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, requestCode, intent,0);
             AlarmManager am=(AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
-            am.cancel(pendingIntent);
+            if (am != null) {
+                am.cancel(pendingIntent);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

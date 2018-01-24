@@ -50,7 +50,7 @@
             android:key="KEY_ENABLE_HCM" />
 
         <ListPreference
-            android:defaultValue="GeoCheck"
+            android:defaultValue="Geo Check"
             android:entries="@array/pref_hcm_function_titles"
             android:entryValues="@array/pref_hcm_function_values"
             android:key="KEY_HCM_FUNCTION_LIST"
@@ -60,12 +60,14 @@
             android:summary="%s"/>
 
         <com.hcm.hcmautosign.TimePreference
+            android:defaultValue="8:35"
             android:key="timePrefClockIn_Key"
-            android:title="Clock In Time"/>
+            android:title="Clock In Time" />
 
         <com.hcm.hcmautosign.TimePreference
+            android:defaultValue="17:25"
             android:key="timePrefClockOut_Key"
-            android:title="Clock Out Time"/>
+            android:title="Clock Out Time" />
 
     </PreferenceCategory>
 </PreferenceScreen>

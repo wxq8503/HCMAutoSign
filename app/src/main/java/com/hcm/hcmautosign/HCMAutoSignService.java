@@ -3,6 +3,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 public class HCMAutoSignService extends Service {
 
@@ -16,13 +17,8 @@ public class HCMAutoSignService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         alarm.setAlarm(this);
+        Toast.makeText(this, "Auto HCM Service Started", Toast.LENGTH_SHORT).show();
         return START_STICKY;
-    }
-
-    @Override
-    public void onStart(Intent intent, int startId)
-    {
-        alarm.setAlarm(this);
     }
 
     @Override
@@ -31,4 +27,15 @@ public class HCMAutoSignService extends Service {
         return null;
     }
 
+    @Override
+    public void onDestroy() {
+        Intent intent_in = new Intent(this, alarm.getClass());
+        intent_in.setAction("CLOCK_IN");//自定义的执行定义任务的Action
+        alarm.cancelAlarm(this, intent_in);
+
+        Intent intent_out = new Intent(this, alarm.getClass());
+        intent_out.setAction("CLOCK_OUT");//自定义的执行定义任务的Action
+        alarm.cancelAlarm(this, intent_out);
+        Toast.makeText(this, "Auto HCM Service Canceled", Toast.LENGTH_SHORT).show();
+    }
 }

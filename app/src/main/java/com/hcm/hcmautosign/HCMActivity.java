@@ -43,11 +43,6 @@ import okhttp3.Response;
 public class HCMActivity extends AppCompatActivity implements View.OnClickListener{
 
     private TextView mTextMessage;
-    private Button btnPunchin;
-    private Button btnHCMSetting;
-    private Button btnGeoCheck;
-    private Button btnSignRecords;
-    private String action;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
     private String TAG = HCMActivity.class.getSimpleName();
@@ -59,10 +54,10 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hcm);
 
-        btnPunchin = findViewById(R.id.btnPunchin);
-        btnGeoCheck= findViewById(R.id.btnGeoCheck);
-        btnSignRecords= findViewById(R.id.btnSignRecords);
-        btnHCMSetting = findViewById(R.id.btnHCMSetting);
+        Button btnPunchin = findViewById(R.id.btnPunchin);
+        Button btnGeoCheck = findViewById(R.id.btnGeoCheck);
+        Button btnSignRecords = findViewById(R.id.btnSignRecords);
+        Button btnHCMSetting = findViewById(R.id.btnHCMSetting);
 
         btnPunchin.setOnClickListener(this);
         btnGeoCheck.setOnClickListener(this);
@@ -75,24 +70,15 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         mTextMessage.setText(authorization);
         lv = findViewById(R.id.hcm_list);
 
-        registerReceiver(broadcastReceiver, new IntentFilter("GEO_CHECK"));
+        registerReceiver(broadcastReceiver, new IntentFilter("HCM_CLOUD"));
     }
 
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // internet lost alert dialog method call from here
-            String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
-            String longitude;
-            longitude = preferences.getString("KEY_PUNCHIN_LONGITUDE", "121.622440");
-            String latitude;
-            latitude = preferences.getString("KEY_PUNCHIN_LATITUDE", "31.260886");
-
-
-            action = preferences.getString("KEY_HCM_FUNCTION_LIST", "GeoCheck");
-            //action = "GeoCheck";
-            Log.i("-----send clock in cmd", action);
-            new JSONTask().execute(action, authorization, longitude, latitude);
+            String action = preferences.getString("KEY_HCM_FUNCTION_LIST", "GeoCheck");
+            Log.i("-----Receive Broadcast", action);
+            new JSONTask().execute(action);
         }
 
     };
@@ -108,46 +94,48 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         // handle click
         //preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         editor = preferences.edit();
-
+        String action;
         String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
-        String longitude;
-        longitude = preferences.getString("KEY_PUNCHIN_LONGITUDE", "121.622440");
-        String latitude;
-        latitude = preferences.getString("KEY_PUNCHIN_LATITUDE", "31.260886");
-        String clock_in;
-        clock_in = preferences.getString("timePrefClockIn_Key", "N/A");
-        String clock_out;
-        clock_out = preferences.getString("timePrefClockOut_Key", "N/A");
+        //String longitude = preferences.getString("KEY_PUNCHIN_LONGITUDE", "121.622440");
+        //longitude = preferences.getString("KEY_PUNCHIN_LONGITUDE", "121.622440");
+        //String latitude = preferences.getString("KEY_PUNCHIN_LATITUDE", "31.260886");
+        //latitude = preferences.getString("KEY_PUNCHIN_LATITUDE", "31.260886");
+        //String clock_in;
+        //clock_in = preferences.getString("timePrefClockIn_Key", "N/A");
+        //String clock_out;
+        //clock_out = preferences.getString("timePrefClockOut_Key", "N/A");
 
-        Log.i("-----send time clock in", clock_in);
-        Log.i("-----send time clockout", clock_out);
+        //Log.i("-----send time clock in", clock_in);
+        //Log.i("-----send time clockout", clock_out);
 
         if("N/A".equals(authorization)){
             Toast.makeText(getApplicationContext(),
                     "Can not find the authrization code,\n Please update the code first!",
                     Toast.LENGTH_LONG).show();
-        }
-
-        resultList = new ArrayList<>();
-        switch (v.getId()) {
-            case R.id.btnGeoCheck:
-                mTextMessage.setText("检查打卡点");
-                action = "GeoCheck";
-                new JSONTask().execute(action, authorization, longitude, latitude);
-                break;
-            case R.id.btnPunchin:
-                mTextMessage.setText(R.string.title_dashboard);
-                action = "Punchin";
-                new JSONTask().execute(action, authorization, longitude, latitude);
-                break;
-            case R.id.btnSignRecords:
-                mTextMessage.setText(R.string.title_notifications);
-                action = "PunCheck";
-                new JSONTask().execute(action, authorization, longitude, latitude);
-                break;
-            case R.id.btnHCMSetting:
-                getHCMSettingsFragment(v);
-                break;
+            getHCMSettingsFragment(v);
+        }else{
+            resultList = new ArrayList<>();
+            switch (v.getId()) {
+                case R.id.btnGeoCheck:
+                    mTextMessage.setText("检查打卡点");
+                    action = "GeoCheck";
+                    //new JSONTask().execute(action, authorization, longitude, latitude);
+                    new JSONTask().execute(action);
+                    break;
+                case R.id.btnPunchin:
+                    mTextMessage.setText(R.string.title_dashboard);
+                    action = "Punchin";
+                    new JSONTask().execute(action);
+                    break;
+                case R.id.btnSignRecords:
+                    mTextMessage.setText(R.string.title_notifications);
+                    action = "PunCheck";
+                    new JSONTask().execute(action);
+                    break;
+                case R.id.btnHCMSetting:
+                    getHCMSettingsFragment(v);
+                    break;
+            }
         }
     }
 
@@ -166,7 +154,7 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    public class JSONTask extends AsyncTask<String,String,String> {
+    public class JSONTask extends AsyncTask<String,String,ArrayList<HashMap<String, String>>> {
 
         //Alan
         //final  String authorization = "a6d7677286399a22978a1754cb954c4785eec1f5";
@@ -176,23 +164,24 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         //final  String user_agent = "Mozilla/5.0 (Linux; Android 6.0; 1505-A01 Build/MRA58K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.49 Mobile MQQBrowser/6.2 TBS/043632 Safari/537.36 MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN";
 
         @Override
-        protected String doInBackground(String... params) {
+        protected ArrayList<HashMap<String, String>> doInBackground(String... params) {
             try {
-                String authorization =  params[1].trim();
-                String longitude = params[2].trim();
-                String latitude = params[3].trim();
+                //String authorization =  params[1].trim();
+                //String longitude = params[2].trim();
+                //String latitude = params[3].trim();
 
                 if(params[0].equals("GeoCheck" )) {
                     Log.i("-----send action", "GeoCheck");
-                    return HCM_GeoCheck_OKHttp(authorization, longitude, latitude);
+                    return HCM_GeoCheck_OKHttp();
                 }
                 if(params[0].equals("Punchin")) {
                     Log.i("-----send action", "Punchin");
-                    return HCM_Punchin_OKHttp(authorization, longitude, latitude);
+                    //return HCM_Punchin_OKHttp(authorization, longitude, latitude);
+                    return HCM_Punchin_OKHttp();
                 }
                 if(params[0].equals("PunCheck")) {
                     Log.i("-----send action", "PunCheck");
-                    return HCM_PunCheck_OKHttp(authorization);
+                    return HCM_PunCheck_OKHttp();
                 }
             } catch (Exception e){
                 Log.i("-----send Error", e.toString());
@@ -201,9 +190,9 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
 
                 // adding each child node to HashMap key => value
                 punch_item.put("item", "Error Catched");
-                punch_item.put("note", e.getMessage());
+                punch_item.put("note", "Error");
                 resultList.add(punch_item);
-                return e.getMessage();
+                return resultList;
             }
             return null;
         }
@@ -226,20 +215,20 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
             manager.notify(0, builder.build());
         }
 
-        public String HCM_PunCheck_OKHttp(String authorization){
+        public ArrayList<HashMap<String, String>> HCM_PunCheck_OKHttp(){
             String url_str = "https://open.hcmcloud.cn/api/attend.view.employee.day";
             String name = "hcm cloud";
             String accuracy = "0";
             //String latitude = "31.260886";
             //String longitude = "121.62253";
+
+            String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
+
             String employee_id = "";
             String date = "";
             Long tsLong = System.currentTimeMillis();
             String timestamp = tsLong.toString();
             List<String> hash_text_list = new ArrayList<>();
-            //hash_text_list.add(latitude);
-            //hash_text_list.add(longitude);
-            //hash_text_list.add(accuracy);
             hash_text_list.add(timestamp);
             hash_text_list.add(name);
 
@@ -344,14 +333,21 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                         });
                     }
                 }
-                return  return_contactor;
+                return  resultList;
             } catch (IOException e) {
                 e.printStackTrace();
             }
             return null;
         }
 
-        public String HCM_GeoCheck_OKHttp(String authorization, String longitude_str, String latitude_str){
+        //public String HCM_GeoCheck_OKHttp(String authorization, String longitude_str, String latitude_str){
+        public ArrayList<HashMap<String, String>> HCM_GeoCheck_OKHttp(){
+            String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
+            String longitude_str;
+            longitude_str = preferences.getString("KEY_PUNCHIN_LONGITUDE", "121.622440");
+            String latitude_str;
+            latitude_str = preferences.getString("KEY_PUNCHIN_LATITUDE", "31.260886");
+
             String url_str = "https://open.hcmcloud.cn/api/attend.signin.geocheck";
             String name = "hcm cloud";
             String accuracy = "0";
@@ -479,14 +475,21 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                         });
                     }
                 }
-                return return_contact;
+                return resultList;
             } catch (IOException e) {
                 e.printStackTrace();
             }
             return null;
         }
 
-        public String HCM_Punchin_OKHttp(String authorization, String longitude, String latitude){
+        //public String HCM_Punchin_OKHttp(String authorization, String longitude, String latitude){
+        public ArrayList<HashMap<String, String>> HCM_Punchin_OKHttp(){
+            String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
+            String longitude;
+            longitude = preferences.getString("KEY_PUNCHIN_LONGITUDE", "121.622440");
+            String latitude;
+            latitude = preferences.getString("KEY_PUNCHIN_LATITUDE", "31.260886");
+
             String url_str = "https://open.hcmcloud.cn/api/attend.signin.create";
             String name = "hcm cloud";
             String location_id = "3218";
@@ -614,7 +617,7 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                         });
                     }
                 }
-                return return_contact;
+                return resultList;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -723,7 +726,7 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(ArrayList<HashMap<String, String>> result) {
             super.onPostExecute(result);
             //mTextMessage.setText(result);
             ListAdapter adapter = new SimpleAdapter(HCMActivity.this, resultList, R.layout.hcm_list_item, new String[]{ "item","note"}, new int[]{R.id.item, R.id.note});

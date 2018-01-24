@@ -109,11 +109,11 @@
         <item>121.62244|31.260866</item>
     </string-array>
 
-    <string name="pref_title_hcm_function">Function</string>
+    <string name="pref_title_hcm_function">Action</string>
     <string-array name="pref_hcm_function_titles">
         <item>Geo Check</item>
         <item>Punch Check</item>
-        <item>Clocl In/Out</item>
+        <item>Clock In/Out</item>
     </string-array>
     <string-array name="pref_hcm_function_values">
         <item>GeoCheck</item>

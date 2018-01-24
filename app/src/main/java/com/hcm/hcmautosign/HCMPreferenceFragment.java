@@ -45,6 +45,21 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
             editTextPreference_LATITUDE.setSummary(LATITUDE);
         }
 
+        SwitchPreference auto_hcm_enabled = (SwitchPreference) findPreference("KEY_ENABLE_HCM");
+        TimePreference clock_in = (TimePreference) findPreference("timePrefClockIn_Key");
+        TimePreference clock_out = (TimePreference) findPreference("timePrefClockOut_Key");
+        ListPreference listPreference = (ListPreference) findPreference("KEY_HCM_FUNCTION_LIST");
+        boolean checked = auto_hcm_enabled.isChecked();
+        if(checked) {
+            clock_in.setEnabled(true);
+            clock_out.setEnabled(true);
+            listPreference.setEnabled(true);
+        }else{
+            clock_in.setEnabled(false);
+            clock_out.setEnabled(false);
+            listPreference.setEnabled(false);
+        }
+
     }
 
     @Override
@@ -68,15 +83,19 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
                 Preference connectionPref = findPreference(key);
                 TimePreference clock_in = (TimePreference) findPreference("timePrefClockIn_Key");
                 TimePreference clock_out = (TimePreference) findPreference("timePrefClockOut_Key");
+                ListPreference listPreference = (ListPreference) findPreference("KEY_HCM_FUNCTION_LIST");
+
                 boolean checked = ((SwitchPreference) connectionPref).isChecked();
                 if(checked) {
                     clock_in.setEnabled(true);
                     clock_out.setEnabled(true);
+                    listPreference.setEnabled(true);
                     getActivity().startService(new Intent(getActivity(), HCMAutoSignService.class));
                 }else{
                     getActivity().stopService(new Intent(getActivity(), HCMAutoSignService.class));
                     clock_in.setEnabled(false);
                     clock_out.setEnabled(false);
+                    listPreference.setEnabled(false);
                 }
                 break;
             }
