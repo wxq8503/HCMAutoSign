@@ -29,8 +29,10 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -70,7 +72,18 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         mTextMessage.setText(authorization);
         lv = findViewById(R.id.hcm_list);
 
-        registerReceiver(broadcastReceiver, new IntentFilter("HCM_CLOUD"));
+        String str_last_time_action = preferences.getString("KEY_LAST_ACTION_AND_TIME", "N/A | N/A");
+        Log.i("-----str_last_time_action", str_last_time_action);
+        HashMap<String, String> last_time_action = new HashMap<>();
+        last_time_action.put("item", "Last Processed Command: " + str_last_time_action.split("\\|")[0]);
+        last_time_action.put("note", str_last_time_action.split("\\|")[1]);
+
+        ArrayList<HashMap<String, String>> last_action = new ArrayList<HashMap<String,String>>();
+        last_action.add(last_time_action);
+        ListAdapter adapter = new SimpleAdapter(HCMActivity.this, last_action, R.layout.hcm_list_item, new String[]{ "item","note"}, new int[]{R.id.item, R.id.note});
+        lv.setAdapter(adapter);
+
+        registerReceiver(broadcastReceiver, new IntentFilter("com.hcm.hcmautosign.HCM_CLOUD"));
     }
 
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -169,6 +182,10 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                 //String authorization =  params[1].trim();
                 //String longitude = params[2].trim();
                 //String latitude = params[3].trim();
+                String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+
+                editor.putString("KEY_LAST_ACTION_AND_TIME", params[0] + "|" + currentDateTimeString);
+                editor.commit();
 
                 if(params[0].equals("GeoCheck" )) {
                     Log.i("-----send action", "GeoCheck");
@@ -732,6 +749,14 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
             ListAdapter adapter = new SimpleAdapter(HCMActivity.this, resultList, R.layout.hcm_list_item, new String[]{ "item","note"}, new int[]{R.id.item, R.id.note});
             lv.setAdapter(adapter);
         }
+
+        @Override
+        protected void onPreExecute(){
+            // Activity 1 GUI stuff
+            super.onPreExecute();
+        }
+
+
     }
 
 }
