@@ -90,8 +90,8 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = preferences.getString("KEY_HCM_FUNCTION_LIST", "GeoCheck");
-            Log.i("-----Receive Broadcast", action);
-            new JSONTask().execute(action);
+            Log.i("-----Receive Broadcast 1", action);
+            //new JSONTask().execute(action);
         }
 
     };

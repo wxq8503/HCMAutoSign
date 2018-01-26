@@ -30,6 +30,8 @@
         <receiver android:name=".Alarm">
             <intent-filter>
                 <action android:name="com.hcm.hcmautosign.HCM_CLOUD" />
+                <action android:name="com.hcm.hcmautosign.CLOCK_IN" />
+                <action android:name="com.hcm.hcmautosign.CLOCK_OUT" />
             </intent-filter>
         </receiver>
     </application>
