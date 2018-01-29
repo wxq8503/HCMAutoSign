@@ -30,11 +30,11 @@ public class HCMAutoSignService extends Service {
     @Override
     public void onDestroy() {
         Intent intent_in = new Intent(this, alarm.getClass());
-        intent_in.setAction("CLOCK_IN");//自定义的执行定义任务的Action
+        intent_in.setAction("com.hcm.hcmautosign.CLOCK_IN");//自定义的执行定义任务的Action
         alarm.cancelAlarm(this, intent_in);
 
         Intent intent_out = new Intent(this, alarm.getClass());
-        intent_out.setAction("CLOCK_OUT");//自定义的执行定义任务的Action
+        intent_out.setAction("com.hcm.hcmautosign.CLOCK_OUT");//自定义的执行定义任务的Action
         alarm.cancelAlarm(this, intent_out);
         Toast.makeText(this, "Auto HCM Service Canceled", Toast.LENGTH_SHORT).show();
     }

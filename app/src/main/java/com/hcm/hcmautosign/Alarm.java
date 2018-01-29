@@ -43,15 +43,13 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
-import static android.app.PendingIntent.getBroadcast;
-
 
 public class Alarm extends BroadcastReceiver
 {
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
     private String TAG = HCMActivity.class.getSimpleName();
-    ArrayList<HashMap<String, String>> resultList;
+    private boolean debug = true;
 
     @Override
     public void onReceive(Context context, Intent intent)
@@ -63,7 +61,7 @@ public class Alarm extends BroadcastReceiver
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = preferences.edit();
         String action = preferences.getString("KEY_HCM_FUNCTION_LIST", "GeoCheck");
-        Log.i("-----Receive Broadcast 0", action);
+        if(debug) Log.i("-----Receive Broadcast 0", action);
         new JSONTask().execute(action);
         //context.sendBroadcast(new Intent("com.hcm.hcmautosign.HCM_CLOUD"));
         wl.release();
@@ -75,22 +73,22 @@ public class Alarm extends BroadcastReceiver
         AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        editor = preferences.edit();
+        //editor = preferences.edit();
 
         String clock_in;
         clock_in = preferences.getString("timePrefClockIn_Key", "8:35");
         String clock_out;
         clock_out = preferences.getString("timePrefClockOut_Key", "17:25");
 
-        Log.i("-----send time clock in", clock_in);
-        Log.i("-----send time clockout", clock_out);
+        //if(debug) Log.i("-----send time clock in", clock_in);
+        //if(debug) Log.i("-----send time clockout", clock_out);
 
         // Set the alarm to start at 8:30 a.m.
         Integer clock_in_hour = Integer.parseInt(clock_in.split(":")[0]);
         Integer clock_in_minute = Integer.parseInt(clock_in.split(":")[1]) + ThreadLocalRandom.current().nextInt(1, 4 + 1);
 
-        Log.i("-----send time in hour", String.valueOf(clock_in_hour));
-        Log.i("-----send time in mint", String.valueOf(clock_in_minute));
+        //if(debug) Log.i("-----send time in hour", String.valueOf(clock_in_hour));
+        //if(debug) Log.i("-----send time in mint", String.valueOf(clock_in_minute));
 
         long firstTime = SystemClock.elapsedRealtime(); // 开机之后到现在的运行时间(包括睡眠时间)
         long systemTime = System.currentTimeMillis();
@@ -108,7 +106,7 @@ public class Alarm extends BroadcastReceiver
         // 如果当前时间大于设置的时间，那么就从第二天的设定时间开始
         if(systemTime > selectTime) {
             //Toast.makeText(getBaseContext(),"设置的时间小于当前时间", Toast.LENGTH_SHORT).show();
-            Log.i("-----Set Alarm 1", "设置的时间小于当前时间");
+            if(debug) Log.i("-----Set Alarm 1", "设置的时间小于当前时间");
             calendar_in.add(Calendar.DAY_OF_MONTH, 1);
             selectTime = calendar_in.getTimeInMillis();
         }
@@ -122,15 +120,15 @@ public class Alarm extends BroadcastReceiver
         PendingIntent pi_in = PendingIntent.getBroadcast(context, 0, intent_in, FLAG_UPDATE_CURRENT);
         //am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60 * 10, pi_in); // Millisec * Second * Minute
         //am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60 * 1, pi_in); // Millisec * Second * Minute
-        Log.i("-----Set Alarm", intent_in.getAction());
+        if(debug) Log.i("-----Set Alarm", intent_in.getAction() + " | " + String.valueOf(clock_in_hour) + ":" + String.valueOf(clock_in_minute));
         am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, AlarmManager.INTERVAL_DAY, pi_in);
 
 
         // Set the alarm to start at 8:30 a.m.
         Integer clock_out_hour = Integer.parseInt(clock_out.split(":")[0]);
         Integer clock_out_minute = Integer.parseInt(clock_out.split(":")[1]) + ThreadLocalRandom.current().nextInt(1, 10 + 1);
-        Log.i("-----send time out hour", String.valueOf(clock_out_hour));
-        Log.i("-----send time out mint", String.valueOf(clock_out_minute));
+        //if(debug) Log.i("-----send time out hour", String.valueOf(clock_out_hour));
+        //if(debug) Log.i("-----send time out mint", String.valueOf(clock_out_minute));
 
         Calendar calendar_out = Calendar.getInstance();
         calendar_out.setTimeInMillis(System.currentTimeMillis());
@@ -147,7 +145,7 @@ public class Alarm extends BroadcastReceiver
         // 如果当前时间大于设置的时间，那么就从第二天的设定时间开始
         if(systemTime > selectTime_out) {
             //Toast.makeText(HCMActivity.getContext(),"设置的时间小于当前时间", Toast.LENGTH_SHORT).show();
-            Log.i("-----Set Alarm 2", "设置的时间小于当前时间");
+            if(debug) Log.i("-----Set Alarm 2", "设置的时间小于当前时间");
             calendar_out.add(Calendar.DAY_OF_MONTH, 1);
             selectTime_out = calendar_out.getTimeInMillis();
         }
@@ -159,42 +157,18 @@ public class Alarm extends BroadcastReceiver
         intent_out.setAction("com.hcm.hcmautosign.CLOCK_OUT");//自定义的执行定义任务的Action
         cancelAlarm(context, intent_out);
         PendingIntent pi_out = PendingIntent.getBroadcast(context, 1, intent_out, FLAG_UPDATE_CURRENT);
-        Log.i("-----Set Alarm", intent_out.getAction());
+        if(debug) Log.i("-----Set Alarm", intent_out.getAction() + " | " + String.valueOf(clock_out_hour) + ":" + String.valueOf(clock_out_minute));
         am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime_out, AlarmManager.INTERVAL_DAY, pi_out);
-
-        /*
-        boolean clock_in_b = (PendingIntent.getBroadcast(context, 0,
-                new Intent("CLOCK_IN"),
-                PendingIntent.FLAG_NO_CREATE) != null);
-        if (clock_in_b)
-        {
-            Log.i("myTag", "CLOCK_IN Alarm is already active");
-        }else{
-            Log.i("myTag", "CLOCK_IN Alarm not active");
-        }
-
-        boolean clock_out_b = (PendingIntent.getBroadcast(context, 1,
-                new Intent("CLOCK_OUT"),
-                PendingIntent.FLAG_NO_CREATE) != null);
-        if (clock_out_b)
-        {
-            Log.i("myTag", "CLOCK_OUT Alarm is already active");
-        }else{
-            Log.i("myTag", "CLOCK_OUT Alarm not active");
-        }
-        */
-
     }
 
     public void cancelAlarm(Context context, Intent intent)
     {
         try {
-            //Intent intent = new Intent(context, Alarm.class);
-            Log.i("-----Cancel Alarm", intent.getAction());
             PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, FLAG_UPDATE_CURRENT);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             if (alarmManager != null) {
                 alarmManager.cancel(sender);
+                if(debug) Log.i("-----Cancel Alarm", intent.getAction() + " Canceled");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -206,6 +180,7 @@ public class Alarm extends BroadcastReceiver
         //Alan
         //final  String authorization = "a6d7677286399a22978a1754cb954c4785eec1f5";
         final  String user_agent = "Mozilla/5.0 (Linux; Android 5.1; SM-J5008 Build/LMY47O; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.49 Mobile MQQBrowser/6.2 TBS/043613 Safari/537.36 MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN";
+        ArrayList<HashMap<String, String>> resultList = new ArrayList<HashMap<String, String>>();;
         //Jeff
         //final  String authorization = "a01d2cf78baf4d1d0b586f060a804857bede2bbf";
         //final  String user_agent = "Mozilla/5.0 (Linux; Android 6.0; 1505-A01 Build/MRA58K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.49 Mobile MQQBrowser/6.2 TBS/043632 Safari/537.36 MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN";
@@ -217,26 +192,26 @@ public class Alarm extends BroadcastReceiver
                 //String longitude = params[2].trim();
                 //String latitude = params[3].trim();
                 String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-
+                editor = preferences.edit();
                 editor.putString("KEY_LAST_ACTION_AND_TIME", params[0] + "|" + currentDateTimeString);
                 editor.commit();
 
                 if(params[0].equals("GeoCheck" )) {
-                    Log.i("-----send action", "GeoCheck");
+                    if(debug) Log.i("-----send action", "GeoCheck");
                     return HCM_GeoCheck_OKHttp();
                 }
                 if(params[0].equals("Punchin")) {
-                    Log.i("-----send action", "Punchin");
+                    if(debug) Log.i("-----send action", "Punchin");
                     //return HCM_Punchin_OKHttp(authorization, longitude, latitude);
                     return HCM_Punchin_OKHttp();
                 }
                 if(params[0].equals("PunCheck")) {
-                    Log.i("-----send action", "PunCheck");
+                    if(debug) Log.i("-----send action", "PunCheck");
                     return HCM_PunCheck_OKHttp();
                 }
             } catch (Exception e){
-                Log.i("-----send Error", e.toString());
-                Log.i("-----send Error", e.getMessage());
+                if(debug) Log.i("-----send Error", e.toString());
+                if(debug) Log.i("-----send Error", e.getMessage());
                 HashMap<String, String> punch_item = new HashMap<>();
 
                 // adding each child node to HashMap key => value
@@ -286,14 +261,14 @@ public class Alarm extends BroadcastReceiver
             String hash_text_joined = TextUtils.join("", hash_text_list);
             String hash_text = md5(hash_text_joined);
 
-            Log.i("-----send timestamp", timestamp);
-            Log.i("-----send Hash text", hash_text_joined);
-            Log.i("-----send Hashed", hash_text);
+            if(debug) Log.i("-----send timestamp", timestamp);
+            if(debug) Log.i("-----send Hash text", hash_text_joined);
+            if(debug) Log.i("-----send Hashed", hash_text);
 
             OkHttpClient client = new OkHttpClient();
             MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
             RequestBody body = RequestBody.create(mediaType, "{\"employee_id\":\"" + employee_id + "\",\"date\":\"" + date + "\"}");
-            Log.i("-----send Request Body", "Send Request Body");
+            if(debug) Log.i("-----send Request Body", "Send Request Body");
             //DownloadManager.Request request = new DownloadManager.Request.Builder()
             Request request = new Request.Builder()
                     .url(url_str)
@@ -314,18 +289,18 @@ public class Alarm extends BroadcastReceiver
                 String result = response.body().string();//4.获得返回结果
                 result = unicodeToUtf8(result);
                 //String result = "Test";
-                Log.i("-----send Reponse Body", result);
+                if(debug) Log.i("-----send Reponse Body", result);
                 String return_contactor = "";
                 try {
                     JSONObject jsonObj = new JSONObject(result);
                     JSONObject punchinresultObj = jsonObj.getJSONObject("result");
                     String success_flag = punchinresultObj.getString("success");
-                    Log.e(TAG, "success_flag: " + success_flag);
+                    if(debug) Log.e(TAG, "success_flag: " + success_flag);
                     JSONObject punchindataObj = punchinresultObj.getJSONObject("data");
-                    Log.e(TAG, "punchindataObj: " + punchindataObj);
+                    if(debug) Log.e(TAG, "punchindataObj: " + punchindataObj);
                     // Getting JSON Array node
                     JSONArray punchin = punchindataObj.getJSONArray("signin");
-                    Log.e(TAG, "punchin_flag: " + punchin);
+                    if(debug) Log.e(TAG, "punchin_flag: " + punchin);
 
                     if(punchin.length()>0){
                         // looping through All punchin
@@ -355,14 +330,14 @@ public class Alarm extends BroadcastReceiver
                         //addNotification("打卡记录检查失败，请检查设置");
                         JSONObject jsonObj = new JSONObject(result);
                         final String errmsg = jsonObj.getString("errmsg");
-                        Log.e(TAG, "Error message: " + errmsg);
+                        if(debug) Log.e(TAG, "Error message: " + errmsg);
                         HashMap<String, String> punch_item = new HashMap<>();
                         punch_item.put("item", "Error Message");
                         punch_item.put("note", errmsg);
                         resultList.add(punch_item);
 
                     }catch ( final JSONException ex) {
-                        Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
+                        if(debug) Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
                         HashMap<String, String> punch_item = new HashMap<>();
                         punch_item.put("item", "Json parsing error_1");
                         punch_item.put("note", ex.getMessage());
@@ -393,17 +368,17 @@ public class Alarm extends BroadcastReceiver
 
             double longitude = (Double.parseDouble(longitude_str)+random);
             double latitude = (Double.parseDouble(latitude_str)+random);
-            Log.i("-----send longitude", String.valueOf(longitude));
-            Log.i("-----send latitude", String.valueOf(latitude));
+            if(debug) Log.i("-----send longitude", String.valueOf(longitude));
+            if(debug) Log.i("-----send latitude", String.valueOf(latitude));
 
             NumberFormat format1=NumberFormat.getNumberInstance() ;
             format1.setMaximumFractionDigits(6);
             String longitude_random = format1.format(longitude);
             String latitude_random = format1.format(latitude);
 
-            Log.i("-----send random", String.valueOf(random));
-            Log.i("-----send longitude", String.valueOf(longitude_random));
-            Log.i("-----send latitude", String.valueOf(latitude_random));
+            if(debug) Log.i("-----send random", String.valueOf(random));
+            if(debug) Log.i("-----send longitude", String.valueOf(longitude_random));
+            if(debug) Log.i("-----send latitude", String.valueOf(latitude_random));
 
             Long tsLong = System.currentTimeMillis();
             String timestamp = tsLong.toString();
@@ -417,15 +392,15 @@ public class Alarm extends BroadcastReceiver
             String hash_text_joined = TextUtils.join("", hash_text_list);
             String hash_text = md5(hash_text_joined);
 
-            Log.i("-----send timestamp", timestamp);
-            Log.i("-----send Hash text", hash_text_joined);
-            Log.i("-----send Hashed", hash_text);
+            if(debug) Log.i("-----send timestamp", timestamp);
+            if(debug) Log.i("-----send Hash text", hash_text_joined);
+            if(debug) Log.i("-----send Hashed", hash_text);
 
             OkHttpClient client = new OkHttpClient();
             MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
             String request_body_content = "{\"latitude\":\"" + latitude_random + "\",\"longitude\":\"" + longitude_random + "\",\"accuracy\":0,\"timestamp\":" + timestamp + ",\"hash\":\"" + hash_text + "\"}";
             RequestBody body = RequestBody.create(mediaType, request_body_content);
-            Log.i("-----send Request Body", "Send Request Body:"+ request_body_content);
+            if(debug) Log.i("-----send Request Body", "Send Request Body:"+ request_body_content);
             //DownloadManager.Request request = new DownloadManager.Request.Builder()
             Request request = new Request.Builder()
                     .url(url_str)
@@ -446,15 +421,15 @@ public class Alarm extends BroadcastReceiver
                 String result = response.body().string();//4.获得返回结果
                 result = unicodeToUtf8(result);
                 //String result = "Test";
-                Log.i("-----send Reponse Body", result);
+                if(debug) Log.i("-----send Reponse Body", result);
                 String return_contact = "";
                 try {
                     JSONObject jsonObj = new JSONObject(result);
                     JSONObject jsonCheckresultObj = jsonObj.getJSONObject("result");
-                    Log.e(TAG, "Json result: " + jsonCheckresultObj);
+                    if(debug) Log.e(TAG, "Json result: " + jsonCheckresultObj);
 
                     String check_flag = jsonCheckresultObj.getString("success");
-                    Log.e(TAG, "Json check flag: " + check_flag);
+                    if(debug) Log.e(TAG, "Json check flag: " + check_flag);
 
                     if("false".equals(check_flag)){
                         HashMap<String, String> punch_item = new HashMap<>();
@@ -482,14 +457,14 @@ public class Alarm extends BroadcastReceiver
                         //addNotification("检查到错误");
                         JSONObject jsonObj = new JSONObject(result);
                         final String errmsg = jsonObj.getString("errmsg");
-                        Log.e(TAG, "Error message: " + errmsg);
+                        if(debug) Log.e(TAG, "Error message: " + errmsg);
                         HashMap<String, String> punch_item = new HashMap<>();
                         punch_item.put("item", "Error Message");
                         punch_item.put("note", errmsg);
                         resultList.add(punch_item);
 
                     }catch ( final JSONException ex) {
-                        Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
+                        if(debug) Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
                         HashMap<String, String> punch_item = new HashMap<>();
                         punch_item.put("item", "Json parsing error_1");
                         punch_item.put("note", ex.getMessage());
@@ -531,14 +506,14 @@ public class Alarm extends BroadcastReceiver
             String hash_text_joined = TextUtils.join("", hash_text_list);
             String hash_text = md5(hash_text_joined);
 
-            Log.i("-----send timestamp", timestamp);
-            Log.i("-----send Hash text", hash_text_joined);
-            Log.i("-----send Hashed", hash_text);
+            if(debug) Log.i("-----send timestamp", timestamp);
+            if(debug) Log.i("-----send Hash text", hash_text_joined);
+            if(debug) Log.i("-----send Hashed", hash_text);
 
             OkHttpClient client = new OkHttpClient();
             MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
             RequestBody body = RequestBody.create(mediaType, "{\"location_id\":3218,\"type\":3,\"latitude\":\"" + latitude + "\",\"longitude\":\"" + longitude + "\",\"beacon\":\"\",\"information\":\"{}\",\"timestamp\":"+  timestamp +  ",\"state\":null,\"hash\":\"" + hash_text + "\"}");
-            Log.i("-----send Request Body", "Send Request Body");
+            if(debug) Log.i("-----send Request Body", "Send Request Body");
             //DownloadManager.Request request = new DownloadManager.Request.Builder()
             Request request = new Request.Builder()
                     .url(url_str)
@@ -559,15 +534,15 @@ public class Alarm extends BroadcastReceiver
                 String result = response.body().string();//4.获得返回结果
                 result = unicodeToUtf8(result);
                 //String result = "Test";
-                Log.i("-----send Reponse Body", result);
+                if(debug) Log.i("-----send Reponse Body", result);
                 String return_contact = "";
                 try {
                     JSONObject jsonObj = new JSONObject(result);
                     JSONObject jsonCheckresultObj = jsonObj.getJSONObject("result");
-                    Log.e(TAG, "Json result: " + jsonCheckresultObj);
+                    if(debug) Log.e(TAG, "Json result: " + jsonCheckresultObj);
 
                     String check_flag = jsonCheckresultObj.getString("success");
-                    Log.e(TAG, "Json check flag: " + check_flag);
+                    if(debug) Log.e(TAG, "Json check flag: " + check_flag);
 
                     JSONObject jsonPunchinObj = jsonCheckresultObj.getJSONObject("punchin");
 
@@ -609,13 +584,13 @@ public class Alarm extends BroadcastReceiver
                         //addNotification("打卡失败，请检查设置");
                         JSONObject jsonObj = new JSONObject(result);
                         final String errmsg = jsonObj.getString("errmsg");
-                        Log.e(TAG, "Error message: " + errmsg);
+                        if(debug) Log.e(TAG, "Error message: " + errmsg);
                         HashMap<String, String> punch_item = new HashMap<>();
                         punch_item.put("item", "Error Message");
                         punch_item.put("note", errmsg);
                         resultList.add(punch_item);
                     }catch ( final JSONException ex) {
-                        Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
+                        if(debug) Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
                         HashMap<String, String> punch_item = new HashMap<>();
                         punch_item.put("item", "Json parsing error_1");
                         punch_item.put("note", ex.getMessage());
@@ -720,7 +695,7 @@ public class Alarm extends BroadcastReceiver
                         s = "0" + s;
                     }
                     buffer.append(s);
-                    Log.d("vivi", "encode: " + s);
+                    if(debug) Log.d("vivi", "encode: " + s);
 
                 }
 
