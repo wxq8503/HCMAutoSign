@@ -21,9 +21,11 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_setting_hcm);
-        EditTextPreference editTextPreference_AUTH_CODE = (EditTextPreference) findPreference("KEY_AUTH_CODE");
-        EditTextPreference editTextPreference_LONGITUDE = (EditTextPreference) findPreference("KEY_PUNCHIN_LONGITUDE");
-        EditTextPreference editTextPreference_LATITUDE = (EditTextPreference) findPreference("KEY_PUNCHIN_LATITUDE");
+        getPreferenceManager().setSharedPreferencesName(Config.PREFERENCE_NAME);
+
+        EditTextPreference editTextPreference_AUTH_CODE = (EditTextPreference) findPreference(Config.KEY_AUTH_CODE);
+        EditTextPreference editTextPreference_LONGITUDE = (EditTextPreference) findPreference(Config.KEY_PUNCHIN_LONGITUDE);
+        EditTextPreference editTextPreference_LATITUDE = (EditTextPreference) findPreference(Config.KEY_PUNCHIN_LATITUDE);
 
         String scope = editTextPreference_AUTH_CODE.getText();
         if("0".equals(String.valueOf(scope))) {
@@ -46,10 +48,10 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
             editTextPreference_LATITUDE.setSummary(LATITUDE);
         }
 
-        SwitchPreference auto_hcm_enabled = (SwitchPreference) findPreference("KEY_ENABLE_HCM");
-        TimePreference clock_in = (TimePreference) findPreference("timePrefClockIn_Key");
-        TimePreference clock_out = (TimePreference) findPreference("timePrefClockOut_Key");
-        ListPreference listPreference = (ListPreference) findPreference("KEY_HCM_FUNCTION_LIST");
+        SwitchPreference auto_hcm_enabled = (SwitchPreference) findPreference(Config.KEY_ENABLE_HCM);
+        TimePreference clock_in = (TimePreference) findPreference(Config.KEY_PUNCHIN_TIME);
+        TimePreference clock_out = (TimePreference) findPreference(Config.KEY_PUNCHOUT_TIME);
+        ListPreference listPreference = (ListPreference) findPreference(Config.KEY_HCM_FUNCTION_LIST);
         boolean checked = auto_hcm_enabled.isChecked();
         if(checked) {
             clock_in.setEnabled(true);
@@ -80,11 +82,11 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         switch(key){
-            case "KEY_ENABLE_HCM": {
+            case Config.KEY_ENABLE_HCM: {
                 Preference connectionPref = findPreference(key);
-                TimePreference clock_in = (TimePreference) findPreference("timePrefClockIn_Key");
-                TimePreference clock_out = (TimePreference) findPreference("timePrefClockOut_Key");
-                ListPreference listPreference = (ListPreference) findPreference("KEY_HCM_FUNCTION_LIST");
+                TimePreference clock_in = (TimePreference) findPreference(Config.KEY_PUNCHIN_TIME);
+                TimePreference clock_out = (TimePreference) findPreference(Config.KEY_PUNCHOUT_TIME);
+                ListPreference listPreference = (ListPreference) findPreference(Config.KEY_HCM_FUNCTION_LIST);
 
                 boolean checked = ((SwitchPreference) connectionPref).isChecked();
                 if(checked) {
@@ -100,23 +102,23 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
                 }
                 break;
             }
-            case "KEY_PUNCHIN_LONGITUDE":
-            case "KEY_PUNCHIN_LATITUDE":
-            case "KEY_AUTH_CODE": {
+            case Config.KEY_PUNCHIN_LONGITUDE:
+            case Config.KEY_PUNCHIN_LATITUDE:
+            case Config.KEY_AUTH_CODE: {
                 Preference connectionPref = findPreference(key);
                 // Set summary to be the user-description for the selected value
                 connectionPref.setSummary(sharedPreferences.getString(key, ""));
                 break;
             }
-            case "KEY_HCM_LOCATION_LIST":
+            case Config.KEY_HCM_LOCATION_LIST:
             {
                 // Preference connectionPref = findPreference(key);
                 ListPreference listPreference = (ListPreference) findPreference(key);
                 listPreference.setSummary(listPreference.getEntry());
                 break;
             }
-            case "timePrefClockIn_Key":
-            case "timePrefClockOut_Key": {
+            case Config.KEY_PUNCHIN_TIME:
+            case Config.KEY_PUNCHOUT_TIME: {
                 Log.i("-----Preference Change","Hello");
                 getActivity().startService(new Intent(getActivity(), HCMAutoSignService.class));
                 break;
