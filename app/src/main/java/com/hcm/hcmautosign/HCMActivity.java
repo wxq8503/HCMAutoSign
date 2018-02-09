@@ -71,11 +71,11 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
 
         mTextMessage = findViewById(R.id.txtStatus);
         preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
+        String authorization = preferences.getString(Config.KEY_AUTH_CODE, "N/A");
         mTextMessage.setText(authorization);
         lv = findViewById(R.id.hcm_list);
 
-        String str_last_time_action = preferences.getString("KEY_LAST_ACTION_AND_TIME", "N/A | N/A");
+        String str_last_time_action = preferences.getString(Config.KEY_LAST_ACTION_AND_TIME, "N/A | N/A");
         if(debug) Log.i("-----str_last_time_action", str_last_time_action);
         HashMap<String, String> last_time_action = new HashMap<>();
         last_time_action.put("item", "Last Processed Command: " + str_last_time_action.split("\\|")[0]);
@@ -190,7 +190,10 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
 
         //Alan
         //final  String authorization = "a6d7677286399a22978a1754cb954c4785eec1f5";
-        final  String user_agent = "Mozilla/5.0 (Linux; Android 5.1; SM-J5008 Build/LMY47O; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.49 Mobile MQQBrowser/6.2 TBS/043613 Safari/537.36 MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN";
+        String user_agent_default = "Mozilla/5.0 (Linux; Android 5.1; SM-J5008 Build/LMY47O; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.49 Mobile MQQBrowser/6.2 TBS/043613 Safari/537.36 MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN";
+        final  String user_agent = preferences.getString(Config.KEY_HCM_USER_AGENT_LIST, user_agent_default);
+        final String authorization_code = preferences.getString(Config.KEY_AUTH_CODE, "N/A");
+        final String authorization = preferences.getString(Config.KEY_HCM_USER_LIST, "N/A");
         //Jeff
         //final  String authorization = "a01d2cf78baf4d1d0b586f060a804857bede2bbf";
         //final  String user_agent = "Mozilla/5.0 (Linux; Android 6.0; 1505-A01 Build/MRA58K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.49 Mobile MQQBrowser/6.2 TBS/043632 Safari/537.36 MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN";
@@ -205,6 +208,10 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
 
                 editor.putString("KEY_LAST_ACTION_AND_TIME", params[0] + "|" + currentDateTimeString);
                 editor.commit();
+
+                if(debug) Log.i("-----user of agent", user_agent);
+                if(debug) Log.i("-----authorization", authorization_code);
+                if(debug) Log.i("-----authorization code", authorization);
 
                 if(params[0].equals("GeoCheck" )) {
                     if(debug) Log.i("-----send action", "GeoCheck");
@@ -258,7 +265,7 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
             //String latitude = "31.260886";
             //String longitude = "121.62253";
 
-            String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
+            //String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
 
             String employee_id = "";
             String date = "";
@@ -378,11 +385,11 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
 
         //public String HCM_GeoCheck_OKHttp(String authorization, String longitude_str, String latitude_str){
         public ArrayList<HashMap<String, String>> HCM_GeoCheck_OKHttp(){
-            String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
+            //String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
             String longitude_str;
-            longitude_str = preferences.getString("KEY_PUNCHIN_LONGITUDE", "121.622440");
+            longitude_str = preferences.getString(Config.KEY_PUNCHIN_LONGITUDE, "121.622440");
             String latitude_str;
-            latitude_str = preferences.getString("KEY_PUNCHIN_LATITUDE", "31.260886");
+            latitude_str = preferences.getString(Config.KEY_PUNCHIN_LATITUDE, "31.260886");
 
             String url_str = "https://open.hcmcloud.cn/api/attend.signin.geocheck";
             String name = "hcm cloud";
@@ -520,11 +527,11 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
 
         //public String HCM_Punchin_OKHttp(String authorization, String longitude, String latitude){
         public ArrayList<HashMap<String, String>> HCM_Punchin_OKHttp(){
-            String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
+            //String authorization = preferences.getString("KEY_AUTH_CODE", "N/A");
             String longitude;
-            longitude = preferences.getString("KEY_PUNCHIN_LONGITUDE", "121.622440");
+            longitude = preferences.getString(Config.KEY_PUNCHIN_LONGITUDE, "121.622440");
             String latitude;
-            latitude = preferences.getString("KEY_PUNCHIN_LATITUDE", "31.260886");
+            latitude = preferences.getString(Config.KEY_PUNCHIN_LATITUDE, "31.260886");
 
             String url_str = "https://open.hcmcloud.cn/api/attend.signin.create";
             String name = "hcm cloud";

@@ -9,7 +9,6 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Created by weia on 2018/1/10.
@@ -21,11 +20,12 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_setting_hcm);
-        getPreferenceManager().setSharedPreferencesName(Config.PREFERENCE_NAME);
+        //getPreferenceManager().setSharedPreferencesName(Config.PREFERENCE_NAME);
 
         EditTextPreference editTextPreference_AUTH_CODE = (EditTextPreference) findPreference(Config.KEY_AUTH_CODE);
         EditTextPreference editTextPreference_LONGITUDE = (EditTextPreference) findPreference(Config.KEY_PUNCHIN_LONGITUDE);
         EditTextPreference editTextPreference_LATITUDE = (EditTextPreference) findPreference(Config.KEY_PUNCHIN_LATITUDE);
+        ListPreference listPreference_Devices = (ListPreference) findPreference(Config.KEY_HCM_USER_AGENT_LIST);
 
         String scope = editTextPreference_AUTH_CODE.getText();
         if("0".equals(String.valueOf(scope))) {
@@ -110,10 +110,13 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
                 connectionPref.setSummary(sharedPreferences.getString(key, ""));
                 break;
             }
+            case Config.KEY_HCM_USER_LIST:
             case Config.KEY_HCM_LOCATION_LIST:
+            case Config.KEY_HCM_USER_AGENT_LIST:
             {
                 // Preference connectionPref = findPreference(key);
                 ListPreference listPreference = (ListPreference) findPreference(key);
+                Log.i("-----Preference Change", listPreference.getValue());
                 listPreference.setSummary(listPreference.getEntry());
                 break;
             }

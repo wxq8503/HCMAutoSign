@@ -24,12 +24,14 @@ public class Config {
     public static final String KEY_PUNCHIN_LONGITUDE = "KEY_PUNCHIN_LONGITUDE";
     public static final String KEY_PUNCHIN_LATITUDE = "KEY_PUNCHIN_LATITUDE";
     public static final String KEY_HCM_LOCATION_LIST = "KEY_HCM_LOCATION_LIST";
+    public static final String KEY_HCM_USER_LIST = "KEY_HCM_USER_LIST";
+    public static final String KEY_HCM_USER_AGENT_LIST = "KEY_HCM_USER_AGENT_LIST";
 
     public static final String KEY_ENABLE_HCM = "KEY_ENABLE_HCM";
     public static final String KEY_PUNCHIN_TIME = "timePrefClockIn_Key";
     public static final String KEY_PUNCHOUT_TIME = "timePrefClockOut_Key";
     public static final String KEY_HCM_FUNCTION_LIST = "KEY_HCM_FUNCTION_LIST";
-
+    public static final String KEY_LAST_ACTION_AND_TIME = "KEY_LAST_ACTION_AND_TIME";
 
     public static final String KEY_WECHAT_AFTER_OPEN_HONGBAO = "KEY_WECHAT_AFTER_OPEN_HONGBAO";
     public static final String KEY_WECHAT_DELAY_TIME = "KEY_WECHAT_DELAY_TIME";

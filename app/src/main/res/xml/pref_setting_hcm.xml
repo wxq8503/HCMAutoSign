@@ -40,6 +40,24 @@
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
             android:summary="%s"/>
+
+        <ListPreference
+            android:entries="@array/pref_hcm_user_titles"
+            android:entryValues="@array/pref_hcm_user_values"
+            android:key="KEY_HCM_USER_LIST"
+            android:title="@string/pref_title_hcm_user"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:summary="%s"/>
+
+        <ListPreference
+            android:entries="@array/pref_hcm_uoa_titles"
+            android:entryValues="@array/pref_hcm_uoa_values"
+            android:key="KEY_HCM_USER_AGENT_LIST"
+            android:title="@string/pref_title_hcm_uoa"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:summary="%s"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="HCM Auto Clock In/Out">

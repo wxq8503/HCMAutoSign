@@ -92,13 +92,16 @@
         <item>2</item>
     </string-array>
 
+    <string name="pref_title_hcm_user">Agent</string>
     <string-array name="pref_hcm_user_titles">
-        <item>A.W</item>
-        <item>J.Z</item>
+        <item>A</item>
+        <item>J</item>
+        <item>S</item>
     </string-array>
     <string-array name="pref_hcm_user_values">
+        <item>6562813d77d19cf1033a99926dea460b507a3c44</item>
         <item>c4be3db57de41f516fd41ad9af83b3b3db362756</item>
-        <item>c4be3db57de41f516fd41ad9af83b3b3db362756</item>
+        <item>6cb2553a0becbe25803b9051f89db7ee8b831ce5</item>
     </string-array>
 
     <string name="pref_title_hcm_location">Location</string>
@@ -107,6 +110,20 @@
     </string-array>
     <string-array name="pref_hcm_location_values">
         <item>121.62244|31.260866</item>
+    </string-array>
+
+    <string name="pref_title_hcm_uoa">Devices</string>
+    <string-array name="pref_hcm_uoa_titles">
+        <item>SM-J5008</item>
+        <item>360</item>
+        <item>Honor-X7</item>
+        <item>iPhone</item>
+    </string-array>
+    <string-array name="pref_hcm_uoa_values">
+        <item>Mozilla/5.0 (Linux; Android 5.1; SM-J5008 Build/LMY47O; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.49 Mobile MQQBrowser/6.2 TBS/043613 Safari/537.36 MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN</item>
+        <item>Mozilla/5.0 (Linux; Android 6.0; 1505-A01 Build/MRA58K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.49 Mobile MQQBrowser/6.2 TBS/043632 Safari/537.36 MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN</item>
+        <item>Mozilla/5.0 (Linux; Android 7.0; BND-AL10 Build/HONORBND-AL10; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/57.0.2987.132 Mobile MQQBrowser/6.2 TBS/043722 Safari/537.36 MicroMessenger/6.5.23.1180 NetType/4G Language/zh_CN</item>
+        <item>Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1</item>
     </string-array>
 
     <string name="pref_title_hcm_function">Action</string>
