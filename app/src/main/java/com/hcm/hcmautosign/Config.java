@@ -18,9 +18,11 @@ public class Config {
     public static final String ACTION_NOTIFY_LISTENER_SERVICE_DISCONNECT = "com.codeboy.qianghongbao.NOTIFY_LISTENER_DISCONNECT";
     public static final String ACTION_NOTIFY_LISTENER_SERVICE_CONNECT = "com.codeboy.qianghongbao.NOTIFY_LISTENER_CONNECT";
 
+    public static final boolean debug = true;
     public static final String PREFERENCE_NAME = "config";
 
     public static final String KEY_AUTH_CODE = "KEY_AUTH_CODE";
+    public static final String KEY_AUTH_CODES = "KEY_AUTH_CODES";
     public static final String KEY_PUNCHIN_LONGITUDE = "KEY_PUNCHIN_LONGITUDE";
     public static final String KEY_PUNCHIN_LATITUDE = "KEY_PUNCHIN_LATITUDE";
     public static final String KEY_HCM_LOCATION_LIST = "KEY_HCM_LOCATION_LIST";

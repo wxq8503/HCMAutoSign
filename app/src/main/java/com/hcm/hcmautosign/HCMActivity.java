@@ -76,7 +76,7 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         lv = findViewById(R.id.hcm_list);
 
         String str_last_time_action = preferences.getString(Config.KEY_LAST_ACTION_AND_TIME, "N/A | N/A");
-        if(debug) Log.i("-----str_last_time_action", str_last_time_action);
+        if(Config.debug) Log.i("-----str_last_time_action", str_last_time_action);
         HashMap<String, String> last_time_action = new HashMap<>();
         last_time_action.put("item", "Last Processed Command: " + str_last_time_action.split("\\|")[0]);
         last_time_action.put("note", str_last_time_action.split("\\|")[1]);
@@ -93,7 +93,7 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = preferences.getString("KEY_HCM_FUNCTION_LIST", "GeoCheck");
-            if(debug) Log.i("-----Receive Broadcast 1", action);
+            if(Config.debug) Log.i("-----Receive Broadcast 1", action);
             //new JSONTask().execute(action);
         }
 
@@ -121,8 +121,8 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         //String clock_out;
         //clock_out = preferences.getString("timePrefClockOut_Key", "N/A");
 
-        //if(debug) Log.i("-----send time clock in", clock_in);
-        //if(debug) Log.i("-----send time clockout", clock_out);
+        //if(Config.debug) Log.i("-----send time clock in", clock_in);
+        //if(Config.debug) Log.i("-----send time clockout", clock_out);
 
         if("N/A".equals(authorization)){
             Toast.makeText(getApplicationContext(),
@@ -188,15 +188,10 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
 
     public class JSONTask extends AsyncTask<String,String,ArrayList<HashMap<String, String>>> {
 
-        //Alan
-        //final  String authorization = "a6d7677286399a22978a1754cb954c4785eec1f5";
         String user_agent_default = "Mozilla/5.0 (Linux; Android 5.1; SM-J5008 Build/LMY47O; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.49 Mobile MQQBrowser/6.2 TBS/043613 Safari/537.36 MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN";
         final  String user_agent = preferences.getString(Config.KEY_HCM_USER_AGENT_LIST, user_agent_default);
         final String authorization_code = preferences.getString(Config.KEY_AUTH_CODE, "N/A");
-        final String authorization = preferences.getString(Config.KEY_HCM_USER_LIST, "N/A");
-        //Jeff
-        //final  String authorization = "a01d2cf78baf4d1d0b586f060a804857bede2bbf";
-        //final  String user_agent = "Mozilla/5.0 (Linux; Android 6.0; 1505-A01 Build/MRA58K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.49 Mobile MQQBrowser/6.2 TBS/043632 Safari/537.36 MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN MicroMessenger/6.5.23.1180 NetType/WIFI Language/zh_CN";
+        final String authorization = preferences.getString(Config.KEY_HCM_USER_LIST, authorization_code);
 
         @Override
         protected ArrayList<HashMap<String, String>> doInBackground(String... params) {
@@ -209,26 +204,26 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                 editor.putString("KEY_LAST_ACTION_AND_TIME", params[0] + "|" + currentDateTimeString);
                 editor.commit();
 
-                if(debug) Log.i("-----user of agent", user_agent);
-                if(debug) Log.i("-----authorization", authorization_code);
-                if(debug) Log.i("-----authorization code", authorization);
+                if(Config.debug) Log.i("-----user of agent", user_agent);
+                if(Config.debug) Log.i("-----authorization", authorization_code);
+                if(Config.debug) Log.i("-----authorization code", authorization);
 
                 if(params[0].equals("GeoCheck" )) {
-                    if(debug) Log.i("-----send action", "GeoCheck");
+                    if(Config.debug) Log.i("-----send action", "GeoCheck");
                     return HCM_GeoCheck_OKHttp();
                 }
                 if(params[0].equals("Punchin")) {
-                    if(debug) Log.i("-----send action", "Punchin");
+                    if(Config.debug) Log.i("-----send action", "Punchin");
                     //return HCM_Punchin_OKHttp(authorization, longitude, latitude);
                     return HCM_Punchin_OKHttp();
                 }
                 if(params[0].equals("PunCheck")) {
-                    if(debug) Log.i("-----send action", "PunCheck");
+                    if(Config.debug) Log.i("-----send action", "PunCheck");
                     return HCM_PunCheck_OKHttp();
                 }
             } catch (Exception e){
-                if(debug) Log.i("-----send Error", e.toString());
-                if(debug) Log.i("-----send Error", e.getMessage());
+                if(Config.debug) Log.i("-----send Error", e.toString());
+                if(Config.debug) Log.i("-----send Error", e.getMessage());
                 HashMap<String, String> punch_item = new HashMap<>();
 
                 // adding each child node to HashMap key => value
@@ -278,14 +273,14 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
             String hash_text_joined = TextUtils.join("", hash_text_list);
             String hash_text = md5(hash_text_joined);
 
-            if(debug) Log.i("-----send timestamp", timestamp);
-            if(debug) Log.i("-----send Hash text", hash_text_joined);
-            if(debug) Log.i("-----send Hashed", hash_text);
+            if(Config.debug) Log.i("-----send timestamp", timestamp);
+            if(Config.debug) Log.i("-----send Hash text", hash_text_joined);
+            if(Config.debug) Log.i("-----send Hashed", hash_text);
 
             OkHttpClient client = new OkHttpClient();
             MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
             RequestBody body = RequestBody.create(mediaType, "{\"employee_id\":\"" + employee_id + "\",\"date\":\"" + date + "\"}");
-            if(debug) Log.i("-----send Request Body", "Send Request Body");
+            if(Config.debug) Log.i("-----send Request Body", "Send Request Body");
             //DownloadManager.Request request = new DownloadManager.Request.Builder()
             Request request = new Request.Builder()
                     .url(url_str)
@@ -306,18 +301,18 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                 String result = response.body().string();//4.获得返回结果
                 result = unicodeToUtf8(result);
                 //String result = "Test";
-                if(debug) Log.i("-----send Reponse Body", result);
+                if(Config.debug) Log.i("-----send Reponse Body", result);
                 String return_contactor = "";
                 try {
                     JSONObject jsonObj = new JSONObject(result);
                     JSONObject punchinresultObj = jsonObj.getJSONObject("result");
                     String success_flag = punchinresultObj.getString("success");
-                    if(debug) Log.e(TAG, "success_flag: " + success_flag);
+                    if(Config.debug) Log.e(TAG, "success_flag: " + success_flag);
                     JSONObject punchindataObj = punchinresultObj.getJSONObject("data");
-                    if(debug) Log.e(TAG, "punchindataObj: " + punchindataObj);
+                    if(Config.debug) Log.e(TAG, "punchindataObj: " + punchindataObj);
                     // Getting JSON Array node
                     JSONArray punchin = punchindataObj.getJSONArray("signin");
-                    if(debug) Log.e(TAG, "punchin_flag: " + punchin);
+                    if(Config.debug) Log.e(TAG, "punchin_flag: " + punchin);
 
                     if(punchin.length()>0){
                         // looping through All punchin
@@ -347,7 +342,7 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                         addNotification("打卡记录检查失败，请检查设置");
                         JSONObject jsonObj = new JSONObject(result);
                         final String errmsg = jsonObj.getString("errmsg");
-                        if(debug) Log.e(TAG, "Error message: " + errmsg);
+                        if(Config.debug) Log.e(TAG, "Error message: " + errmsg);
                         HashMap<String, String> punch_item = new HashMap<>();
                         punch_item.put("item", "Error Message");
                         punch_item.put("note", errmsg);
@@ -361,7 +356,7 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                             }
                         });
                     }catch ( final JSONException ex) {
-                        if(debug) Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
+                        if(Config.debug) Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
                         HashMap<String, String> punch_item = new HashMap<>();
                         punch_item.put("item", "Json parsing error_1");
                         punch_item.put("note", ex.getMessage());
@@ -400,17 +395,17 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
 
             double longitude = (Double.parseDouble(longitude_str)+random);
             double latitude = (Double.parseDouble(latitude_str)+random);
-            if(debug) Log.i("-----send longitude", String.valueOf(longitude));
-            if(debug) Log.i("-----send latitude", String.valueOf(latitude));
+            if(Config.debug) Log.i("-----send longitude", String.valueOf(longitude));
+            if(Config.debug) Log.i("-----send latitude", String.valueOf(latitude));
 
             NumberFormat format1=NumberFormat.getNumberInstance() ;
             format1.setMaximumFractionDigits(6);
             String longitude_random = format1.format(longitude);
             String latitude_random = format1.format(latitude);
 
-            if(debug) Log.i("-----send random", String.valueOf(random));
-            if(debug) Log.i("-----send longitude", String.valueOf(longitude_random));
-            if(debug) Log.i("-----send latitude", String.valueOf(latitude_random));
+            if(Config.debug) Log.i("-----send random", String.valueOf(random));
+            if(Config.debug) Log.i("-----send longitude", String.valueOf(longitude_random));
+            if(Config.debug) Log.i("-----send latitude", String.valueOf(latitude_random));
 
             Long tsLong = System.currentTimeMillis();
             String timestamp = tsLong.toString();
@@ -424,15 +419,15 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
             String hash_text_joined = TextUtils.join("", hash_text_list);
             String hash_text = md5(hash_text_joined);
 
-            if(debug) Log.i("-----send timestamp", timestamp);
-            if(debug) Log.i("-----send Hash text", hash_text_joined);
-            if(debug) Log.i("-----send Hashed", hash_text);
+            if(Config.debug) Log.i("-----send timestamp", timestamp);
+            if(Config.debug) Log.i("-----send Hash text", hash_text_joined);
+            if(Config.debug) Log.i("-----send Hashed", hash_text);
 
             OkHttpClient client = new OkHttpClient();
             MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
             String request_body_content = "{\"latitude\":\"" + latitude_random + "\",\"longitude\":\"" + longitude_random + "\",\"accuracy\":0,\"timestamp\":" + timestamp + ",\"hash\":\"" + hash_text + "\"}";
             RequestBody body = RequestBody.create(mediaType, request_body_content);
-            if(debug) Log.i("-----send Request Body", "Send Request Body:"+ request_body_content);
+            if(Config.debug) Log.i("-----send Request Body", "Send Request Body:"+ request_body_content);
             //DownloadManager.Request request = new DownloadManager.Request.Builder()
             Request request = new Request.Builder()
                     .url(url_str)
@@ -453,15 +448,15 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                 String result = response.body().string();//4.获得返回结果
                 result = unicodeToUtf8(result);
                 //String result = "Test";
-                if(debug) Log.i("-----send Reponse Body", result);
+                if(Config.debug) Log.i("-----send Reponse Body", result);
                 String return_contact = "";
                 try {
                     JSONObject jsonObj = new JSONObject(result);
                     JSONObject jsonCheckresultObj = jsonObj.getJSONObject("result");
-                    if(debug) Log.e(TAG, "Json result: " + jsonCheckresultObj);
+                    if(Config.debug) Log.e(TAG, "Json result: " + jsonCheckresultObj);
 
                     String check_flag = jsonCheckresultObj.getString("success");
-                    if(debug) Log.e(TAG, "Json check flag: " + check_flag);
+                    if(Config.debug) Log.e(TAG, "Json check flag: " + check_flag);
 
                     if("false".equals(check_flag)){
                         HashMap<String, String> punch_item = new HashMap<>();
@@ -489,7 +484,7 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                         addNotification("检查到错误");
                         JSONObject jsonObj = new JSONObject(result);
                         final String errmsg = jsonObj.getString("errmsg");
-                        if(debug) Log.e(TAG, "Error message: " + errmsg);
+                        if(Config.debug) Log.e(TAG, "Error message: " + errmsg);
                         HashMap<String, String> punch_item = new HashMap<>();
                         punch_item.put("item", "Error Message");
                         punch_item.put("note", errmsg);
@@ -503,7 +498,7 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                             }
                         });
                     }catch ( final JSONException ex) {
-                        if(debug) Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
+                        if(Config.debug) Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
                         HashMap<String, String> punch_item = new HashMap<>();
                         punch_item.put("item", "Json parsing error_1");
                         punch_item.put("note", ex.getMessage());
@@ -553,14 +548,14 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
             String hash_text_joined = TextUtils.join("", hash_text_list);
             String hash_text = md5(hash_text_joined);
 
-            if(debug) Log.i("-----send timestamp", timestamp);
-            if(debug) Log.i("-----send Hash text", hash_text_joined);
-            if(debug) Log.i("-----send Hashed", hash_text);
+            if(Config.debug) Log.i("-----send timestamp", timestamp);
+            if(Config.debug) Log.i("-----send Hash text", hash_text_joined);
+            if(Config.debug) Log.i("-----send Hashed", hash_text);
 
             OkHttpClient client = new OkHttpClient();
             MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
             RequestBody body = RequestBody.create(mediaType, "{\"location_id\":3218,\"type\":3,\"latitude\":\"" + latitude + "\",\"longitude\":\"" + longitude + "\",\"beacon\":\"\",\"information\":\"{}\",\"timestamp\":"+  timestamp +  ",\"state\":null,\"hash\":\"" + hash_text + "\"}");
-            if(debug) Log.i("-----send Request Body", "Send Request Body");
+            if(Config.debug) Log.i("-----send Request Body", "Send Request Body");
             //DownloadManager.Request request = new DownloadManager.Request.Builder()
             Request request = new Request.Builder()
                     .url(url_str)
@@ -581,15 +576,15 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                 String result = response.body().string();//4.获得返回结果
                 result = unicodeToUtf8(result);
                 //String result = "Test";
-                if(debug) Log.i("-----send Reponse Body", result);
+                if(Config.debug) Log.i("-----send Reponse Body", result);
                 String return_contact = "";
                 try {
                     JSONObject jsonObj = new JSONObject(result);
                     JSONObject jsonCheckresultObj = jsonObj.getJSONObject("result");
-                    if(debug) Log.e(TAG, "Json result: " + jsonCheckresultObj);
+                    if(Config.debug) Log.e(TAG, "Json result: " + jsonCheckresultObj);
 
                     String check_flag = jsonCheckresultObj.getString("success");
-                    if(debug) Log.e(TAG, "Json check flag: " + check_flag);
+                    if(Config.debug) Log.e(TAG, "Json check flag: " + check_flag);
 
                     JSONObject jsonPunchinObj = jsonCheckresultObj.getJSONObject("punchin");
 
@@ -631,7 +626,7 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                         addNotification("打卡失败，请检查设置");
                         JSONObject jsonObj = new JSONObject(result);
                         final String errmsg = jsonObj.getString("errmsg");
-                        if(debug) Log.e(TAG, "Error message: " + errmsg);
+                        if(Config.debug) Log.e(TAG, "Error message: " + errmsg);
                         HashMap<String, String> punch_item = new HashMap<>();
                         punch_item.put("item", "Error Message");
                         punch_item.put("note", errmsg);
@@ -645,7 +640,7 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                             }
                         });
                     }catch ( final JSONException ex) {
-                        if(debug) Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
+                        if(Config.debug) Log.e(TAG, "Json parsing error 1: " + ex.getMessage());
                         HashMap<String, String> punch_item = new HashMap<>();
                         punch_item.put("item", "Json parsing error_1");
                         punch_item.put("note", ex.getMessage());
@@ -758,7 +753,7 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                         s = "0" + s;
                     }
                     buffer.append(s);
-                    if(debug) Log.d("vivi", "encode: " + s);
+                    if(Config.debug) Log.d("vivi", "encode: " + s);
 
                 }
 
