@@ -1,6 +1,7 @@
 package com.hcm.hcmautosign;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,13 +11,26 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
+import android.util.AttributeSet;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by weia on 2018/1/10.
  */
 
 public class HCMPreferenceFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private static String prefName;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
+    private CharSequence[] mEntries;
+    private CharSequence[] mEntryValues;
+    private List<String> lstEntries;
+    private List<String> lstEntryValues;
+    private static final String SEPERATOR = "SePeRaToR";
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -30,6 +44,7 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
         //ListPreference listPreference_Devices = (ListPreference) findPreference(Config.KEY_HCM_USER_AGENT_LIST);
         //final ListPreference dynamicListPreference = (ListPreference) findPreference(Config.KEY_HCM_USER_LIST);
 
+        final ListPreference lp_1 = MutableListPreference((ListPreference) findPreference(Config.KEY_HCM_USER_LIST), getContext());
         final ListPreference lp = setListPreferenceData((ListPreference) findPreference(Config.KEY_HCM_USER_LIST), getActivity());
         lp.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -114,6 +129,111 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
         return lp;
     }
 
+    public ListPreference MutableListPreference(ListPreference lp, Context context) {
+        prefName = lp.getKey();
+        lstEntries = new ArrayList<String>();
+        lstEntryValues = new ArrayList<String>();
+        mSharedPreferences = context.getSharedPreferences(prefName,0);
+        mEditor = mSharedPreferences.edit();
+        int count = mSharedPreferences.getInt("count", 0);
+        if(count == 0){
+            mEntries = lp.getEntries();
+            mEntryValues = lp.getEntryValues();
+            for(int i=0; i<mEntries.length; i++){
+                mEditor.putString("" + i, mEntries[i] + SEPERATOR + mEntryValues[i]);
+                if(Config.debug) Log.i("-----User " + i, mEntries[i] + SEPERATOR + mEntryValues[i]);
+            }
+            mEditor.putInt("count", mEntries.length);
+            mEditor.commit();
+        }else{
+            String[] temp;
+            mEntries = new String[count];
+            mEntryValues = new String[count];
+            for(int i=0; i<count; i++){
+                temp = mSharedPreferences.getString(""+i, null).split(SEPERATOR);
+                mEntries[i] = temp[0];
+                mEntryValues[i] = temp[1];
+            }
+            lp.setEntries(mEntries);
+            lp.setEntryValues(mEntryValues);
+        }
+        for(CharSequence cs: mEntries)
+            lstEntries.add(cs.toString());
+        for(CharSequence cs: mEntryValues)
+            lstEntryValues.add(cs.toString());
+        return lp;
+    }
+
+    public ListPreference addEntry(ListPreference lp, String key, String value){
+        mEditor.putString(lstEntries.size()+"", key+SEPERATOR+value);
+        mEditor.putInt("count", lstEntries.size()+1);
+        mEditor.commit();
+        lstEntries.add(key);
+        lstEntryValues.add(value);
+        mEntries = new CharSequence[lstEntries.size()];
+        mEntryValues = new CharSequence[lstEntryValues.size()];
+        for(int i=0; i< lstEntries.size(); i++){
+            mEntries[i] = lstEntries.get(i);
+            mEntryValues[i] = lstEntryValues.get(i);
+        }
+        lp.setEntries(mEntries);
+        lp.setEntryValues(mEntryValues);
+        return lp;
+    }
+
+    public ListPreference removeEntry(ListPreference lp, String key){
+        for(int i=0; i< lstEntries.size(); i++){
+
+            if(key.equals(lstEntries.get(i))){
+                lstEntries.remove(i);
+                lstEntryValues.remove(i);
+                --i;
+            }
+        }
+        mEntries = new CharSequence[lstEntries.size()];
+        mEntryValues = new CharSequence[lstEntryValues.size()];
+        for(int i=0; i< lstEntries.size(); i++){
+            mEntries[i] = lstEntries.get(i);
+            mEntryValues[i] = lstEntryValues.get(i);
+        }
+        lp.setEntries(mEntries);
+        lp.setEntryValues(mEntryValues);
+        for(int i=0; i< mEntries.length; i++){
+            mEditor.putString(""+i, mEntries[i] + SEPERATOR + mEntryValues[i]);
+        }
+        mEditor.putInt("count", lstEntries.size());
+        mEditor.commit();
+        return lp;
+    }
+
+    public ListPreference updateEntry(ListPreference lp, String key, String new_value){
+        for(int i=0; i< lstEntries.size(); i++){
+            if(key.equals(lstEntries.get(i))){
+                lstEntries.remove(i);
+                lstEntryValues.remove(i);
+                --i;
+            }
+        }
+        mEntries = new CharSequence[lstEntries.size()];
+        mEntryValues = new CharSequence[lstEntryValues.size()];
+        for(int i=0; i< lstEntries.size(); i++){
+            mEntries[i] = lstEntries.get(i);
+            if(key.equals(lstEntries.get(i))){
+                mEntryValues[i] = new_value;
+            }else{
+                mEntryValues[i] = lstEntryValues.get(i);
+            }
+        }
+        lp.setEntries(mEntries);
+        lp.setEntryValues(mEntryValues);
+        for(int i=0; i< mEntries.length; i++){
+            mEditor.putString(""+i, mEntries[i] + SEPERATOR + mEntryValues[i]);
+        }
+        mEditor.putInt("count", lstEntries.size());
+        mEditor.commit();
+        return lp;
+    }
+
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         switch(key){
             case Config.KEY_ENABLE_HCM: {
@@ -141,7 +261,7 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
             case Config.KEY_AUTH_CODE:
             {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                //editor.putString(Config.KEY_AUTH_CODES, "5a069698214826e690fbe082eb0da8fd01af64670-5a069698214826e690fbe082eb0da8fd01af64671-5a069698214826e690fbe082eb0da8fd01af64672");
+                //editor.putString(Config.KEY_AUTH_CODES, "5a069698214826e690fbe082eb0da8fd01af64670-5a069698214826e690fbe082eb0da8fd01af64671-17a7c3d1ee1bfee70c2eb9a22c8ff783365bc651");
                 //editor.commit();
 
                 Preference connectionPref = findPreference(key);
@@ -176,7 +296,7 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
 
                 editor.putString(Config.KEY_AUTH_CODES, all_auth_codes_new);
                 editor.commit();
-                setListPreferenceData((ListPreference) findPreference(Config.KEY_HCM_USER_LIST), getActivity());
+                setListPreferenceData(userListPref, getActivity());
                 break;
             }
             case Config.KEY_HCM_USER_LIST:
