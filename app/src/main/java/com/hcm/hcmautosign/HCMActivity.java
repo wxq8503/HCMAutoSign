@@ -63,11 +63,13 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
         Button btnGeoCheck = findViewById(R.id.btnGeoCheck);
         Button btnSignRecords = findViewById(R.id.btnSignRecords);
         Button btnHCMSetting = findViewById(R.id.btnHCMSetting);
+        Button btnHCMUserEdit = findViewById(R.id.btnHCMUserEdit);
 
         btnPunchin.setOnClickListener(this);
         btnGeoCheck.setOnClickListener(this);
         btnSignRecords.setOnClickListener(this);
         btnHCMSetting.setOnClickListener(this);
+        btnHCMUserEdit.setOnClickListener(this);
 
         mTextMessage = findViewById(R.id.txtStatus);
         preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -151,6 +153,9 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
                 case R.id.btnHCMSetting:
                     getHCMSettingsFragment(v);
                     break;
+                case R.id.btnHCMUserEdit:
+                    goHCMUserEdit(v);
+                    break;
             }
         }
     }
@@ -165,6 +170,13 @@ public class HCMActivity extends AppCompatActivity implements View.OnClickListen
 
     public void goMoBike(View view) {
         Intent launchIntent = new Intent(this, MobikeActivity.class);
+        if (launchIntent != null) {
+            startActivity(launchIntent);//null pointer check in case package name was not found
+        }
+    }
+
+    public void goHCMUserEdit(View view) {
+        Intent launchIntent = new Intent(this, HCMUserEdit.class);
         if (launchIntent != null) {
             startActivity(launchIntent);//null pointer check in case package name was not found
         }

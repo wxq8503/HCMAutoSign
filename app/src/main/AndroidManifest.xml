@@ -23,6 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:label="HCMPreference" android:name=".HCMPreferencesActivity" />
+        <activity android:label="HCMUserEdit" android:name=".HCMUserEdit" />
         <activity android:label="MoBikePreference" android:name=".MobikePreferencesActivity" />
         <activity android:label="MoBike" android:name=".MobikeActivity"></activity>
 

@@ -183,7 +183,6 @@ public class HCMPreferenceFragment extends PreferenceFragment implements SharedP
 
     public ListPreference removeEntry(ListPreference lp, String key){
         for(int i=0; i< lstEntries.size(); i++){
-
             if(key.equals(lstEntries.get(i))){
                 lstEntries.remove(i);
                 lstEntryValues.remove(i);
